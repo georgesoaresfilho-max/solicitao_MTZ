@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Makro Engenharia — Sistema de Manutenção</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -682,6 +683,69 @@
     .kpi-grid { grid-template-columns: 1fr 1fr; }
     .header-subtitle { display: none; }
   }
+
+  /* ── CHARTS ── */
+  .charts-section {
+    margin-bottom: 1.5rem;
+  }
+  .charts-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+  .charts-header h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .charts-header h3 span { color: var(--red); }
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+  .charts-grid-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .chart-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1.2rem 1.4rem;
+    box-shadow: var(--shadow);
+  }
+  .chart-card-full {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1.2rem 1.4rem;
+    box-shadow: var(--shadow);
+  }
+  .chart-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--gray-light);
+    padding-bottom: 0.5rem;
+  }
+  .chart-title span { color: var(--red); }
+  .chart-container { position: relative; height: 260px; }
+  .chart-container-lg { position: relative; height: 200px; }
+  @media (max-width: 768px) {
+    .charts-grid, .charts-grid-bottom { grid-template-columns: 1fr; }
+    .chart-container, .chart-container-lg { height: 200px; }
+  }
+
 </style>
 </head>
 <body>
@@ -856,6 +920,7 @@
           <div style="font-size:0.8rem;color:var(--gray);margin-top:2px;" id="dash-user-label"></div>
         </div>
         <div class="dash-actions">
+          <button class="btn-export" onclick="loadDashboard()" style="background:var(--navy-mid);">🔄 Atualizar</button>
           <button class="btn-export" onclick="exportExcel()">⬇ Exportar Excel</button>
           <button class="btn-logout" onclick="doLogout()">Sair</button>
         </div>
@@ -883,6 +948,26 @@
           <div class="kpi-value" id="kpi-concluido">0</div>
           <div class="kpi-sub">este mês</div>
         </div>
+      </div>
+
+
+      <!-- CHARTS -->
+      <div class="charts-section">
+        <div class="charts-header">
+          <h3>Análise <span>Gráfica</span></h3>
+          <div style="flex:1;height:1px;background:var(--gray-light);"></div>
+        </div>
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-title">📊 Solicitações por <span>Status</span></div>
+            <div class="chart-container"><canvas id="chart-status"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">🎯 Solicitações por <span>Prioridade</span></div>
+            <div class="chart-container"><canvas id="chart-prio"></canvas></div>
+          </div>
+        </div>
+
       </div>
 
       <!-- Filtros -->
@@ -927,6 +1012,9 @@
               <th>Tipo</th>
               <th>Prioridade</th>
               <th>Status</th>
+              <th style="color:#7eb3ff;">SA</th>
+              <th style="color:#81c784;">SC</th>
+              <th style="color:#ce93d8;">IP</th>
               <th>Descrição</th>
             </tr>
           </thead>
@@ -1016,7 +1104,8 @@
         id: row[0], data: row[1], nome: row[2], matricula: row[3],
         tag: row[4], horimetro: row[5], tipo: row[6], prioridade: row[7],
         status: row[8] || 'Recebido', descricao: row[9] || '',
-        comments: parseComments(row[10])
+        comments: parseComments(row[10]),
+        sa: row[11] || '', sc: row[12] || '', ip: row[13] || ''
       };
     }
     return {
@@ -1030,7 +1119,10 @@
       prioridade: row['Prioridade'] || row.prioridade,
       status: row['Status'] || row.status || 'Recebido',
       descricao: row['Descrição'] || row.descricao || '',
-      comments: parseComments(row['Comentários'] || row.comentarios)
+      comments: parseComments(row['Comentários'] || row.comentarios),
+      sa: row['SA'] || row.sa || '',
+      sc: row['SC'] || row.sc || '',
+      ip: row['IP'] || row.ip || ''
     };
   }
 
@@ -1152,6 +1244,7 @@
     setLoading(false);
     updateKPIs();
     renderTable();
+    renderCharts();
   }
 
   function updateKPIs() {
@@ -1192,7 +1285,10 @@
         <td><span class="badge badge-${s.tipo === 'Peças' ? 'pecas' : 'servico'}">${s.tipo||''}</span></td>
         <td><span class="badge badge-${prioKey}">${s.prioridade||''}</span></td>
         <td><span class="badge badge-${statusKey}">${s.status||''}</span></td>
-        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:0.82rem;">${s.descricao||''}</td>
+        <td><span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.82rem;color:#1a5296;">${s.sa||'—'}</span></td>
+        <td><span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.82rem;color:#2e7d32;">${s.sc||'—'}</span></td>
+        <td><span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.82rem;color:#6a1b9a;">${s.ip||'—'}</span></td>
+        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:0.82rem;">${s.descricao||''}</td>
       `;
       tbody.appendChild(tr);
     });
@@ -1223,6 +1319,9 @@
       <div class="detail-item"><label>Prioridade</label><div class="val"><span class="badge badge-${prioKey}">${s.prioridade||''}</span></div></div>
       <div class="detail-item"><label>Data/Hora</label><div class="val">${s.data||''}</div></div>
       <div class="detail-item"><label>Status Atual</label><div class="val"><span class="badge badge-${statusKey}">${s.status||''}</span></div></div>
+      <div class="detail-item"><label>SA — Solic. de Aquisição</label><div class="val" style="font-weight:700;color:#1a5296;">${s.sa||'<span style=\"color:#aaa;font-weight:400;\">Não informado</span>'}</div></div>
+      <div class="detail-item"><label>SC — Solic. de Compra</label><div class="val" style="font-weight:700;color:#2e7d32;">${s.sc||'<span style=\"color:#aaa;font-weight:400;\">Não informado</span>'}</div></div>
+      <div class="detail-item"><label>IP — Pedido de Compra</label><div class="val" style="font-weight:700;color:#6a1b9a;">${s.ip||'<span style=\"color:#aaa;font-weight:400;\">Não informado</span>'}</div></div>
     `;
     document.getElementById('modal-desc').textContent = s.descricao || '';
     document.getElementById('modal-status').value = s.status || 'Recebido';
@@ -1292,8 +1391,8 @@
 
   // ── EXPORT CSV ──
   function exportExcel() {
-    const headers = ['ID','Data/Hora','Solicitante','Matrícula','TAG','Horímetro','Tipo','Prioridade','Status','Descrição'];
-    const rows = solicitacoes.map(s => [s.id, s.data, s.nome, s.matricula, s.tag, s.horimetro, s.tipo, s.prioridade, s.status, `"${(s.descricao||'').replace(/"/g,'""')}"`]);
+    const headers = ['ID','Data/Hora','Solicitante','Matrícula','TAG','Horímetro','Tipo','Prioridade','Status','Descrição','SA','SC','IP'];
+    const rows = solicitacoes.map(s => [s.id, s.data, s.nome, s.matricula, s.tag, s.horimetro, s.tipo, s.prioridade, s.status, `"${(s.descricao||'').replace(/"/g,'""')}"`, s.sa||'', s.sc||'', s.ip||'']);
     const csv = [headers.join(';'), ...rows.map(r => r.join(';'))].join('\n');
     const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement('a');
@@ -1311,8 +1410,82 @@
     setTimeout(() => t.classList.remove('show'), 3500);
   }
 
-  // Init
-  // Sem dados de exemplo — tudo vem do Google Sheets
+
+  // ── CHARTS ──
+  let chartStatus = null, chartPrio = null;
+
+  function renderCharts() {
+    renderChartStatus();
+    renderChartPrio();
+  }
+
+  function destroyChart(c) { if (c) { c.destroy(); } return null; }
+
+  function renderChartStatus() {
+    chartStatus = destroyChart(chartStatus);
+    const statuses = ['Recebido','Em Análise','Aprovado','Concluído'];
+    const counts = statuses.map(s => solicitacoes.filter(x => x.status === s).length);
+    const ctx = document.getElementById('chart-status').getContext('2d');
+    chartStatus = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: statuses,
+        datasets: [{
+          data: counts,
+          backgroundColor: ['#1565c0','#f57f17','#2e7d32','#6a1b9a'],
+          borderWidth: 3,
+          borderColor: '#ffffff'
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'right', labels: { font: { family: 'Barlow', size: 11 }, boxWidth: 14, padding: 10 } }
+        },
+        cutout: '62%'
+      }
+    });
+  }
+
+  function renderChartPrio() {
+    chartPrio = destroyChart(chartPrio);
+    const prios = ['Baixa','Média','Alta','Crítica'];
+    const counts = prios.map(p => solicitacoes.filter(x => x.prioridade === p).length);
+    const ctx = document.getElementById('chart-prio').getContext('2d');
+    chartPrio = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: prios,
+        datasets: [{
+          label: 'Solicitações',
+          data: counts,
+          backgroundColor: ['#43a047','#fb8c00','#ef6c00','#cc2222'],
+          borderRadius: 6,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: 'Barlow', size: 11 } }, grid: { color: '#e2e8f0' } },
+          x: { ticks: { font: { family: 'Barlow', size: 11 } }, grid: { display: false } }
+        }
+      }
+    });
+  }
+
+
+  // ── TOAST ──
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+
+  // ── CHARTS ──
 </script>
 </body>
 </html>
