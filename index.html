@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Makro Engenharia — Sistema de Manutenção</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1f3c;
+    --navy-mid: #1a3260;
+    --red: #cc2222;
+    --red-dark: #a01818;
+    --red-light: #e63333;
+    --white: #ffffff;
+    --off-white: #f4f6f9;
+    --gray: #8a9ab5;
+    --gray-light: #e2e8f0;
+    --gray-dark: #4a5568;
+    --success: #1a7a4a;
+    --warning: #b07d00;
+    --danger: #cc2222;
+    --info: #1a5296;
+    --shadow: 0 4px 24px rgba(13,31,60,0.13);
+    --shadow-lg: 0 8px 40px rgba(13,31,60,0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--off-white);
+    color: var(--navy);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--navy);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    height: 64px;
+  }
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .logo-icon {
+    height: 36px;
+    width: auto;
+  }
+  .logo-text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .logo-text span { color: var(--red); }
+  .header-subtitle {
+    font-size: 0.72rem;
+    color: var(--gray);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .nav-tabs {
+    display: flex;
+    gap: 0;
+    height: 64px;
+  }
+  .nav-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 1.5rem;
+    color: var(--gray);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.95rem;
+  }
+  .nav-tab:hover { color: var(--white); background: rgba(255,255,255,0.05); }
+  .nav-tab.active { color: var(--white); border-bottom-color: var(--red); background: rgba(204,34,34,0.08); }
+
+  /* ── VIEWS ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── FORM PAGE ── */
+  .form-page {
+    max-width: 720px;
+    margin: 2.5rem auto;
+    padding: 0 1rem 3rem;
+  }
+  .form-hero {
+    background: linear-gradient(135deg, var(--navy) 60%, var(--navy-mid) 100%);
+    border-radius: 16px 16px 0 0;
+    padding: 2rem 2.5rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .form-hero::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 160px; height: 160px;
+    border: 28px solid rgba(204,34,34,0.18);
+    border-radius: 50%;
+  }
+  .form-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; right: 60px;
+    width: 100px; height: 100px;
+    border: 18px solid rgba(204,34,34,0.10);
+    border-radius: 50%;
+  }
+  .form-hero h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+  .form-hero h1 span { color: var(--red-light); }
+  .form-hero p {
+    color: var(--gray);
+    font-size: 0.88rem;
+    margin-top: 0.4rem;
+    font-weight: 400;
+  }
+  .form-card {
+    background: var(--white);
+    border-radius: 0 0 16px 16px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 2rem 0 1.2rem;
+  }
+  .section-divider .label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--red);
+    white-space: nowrap;
+  }
+  .section-divider .line {
+    flex: 1;
+    height: 1px;
+    background: var(--gray-light);
+  }
+
+  .form-row { display: grid; gap: 1rem; margin-bottom: 1rem; }
+  .form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+  .form-row.cols-1 { grid-template-columns: 1fr; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--navy);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .field label .req { color: var(--red); margin-left: 2px; }
+  .field input, .field select, .field textarea {
+    border: 1.5px solid var(--gray-light);
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.92rem;
+    color: var(--navy);
+    background: var(--off-white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    width: 100%;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--navy-mid);
+    box-shadow: 0 0 0 3px rgba(26,50,96,0.10);
+    background: var(--white);
+  }
+  .field textarea { resize: vertical; min-height: 90px; }
+
+  /* Tipo Radio */
+  .type-selector { display: flex; gap: 10px; }
+  .type-btn {
+    flex: 1;
+    padding: 0.75rem;
+    border: 2px solid var(--gray-light);
+    border-radius: 10px;
+    background: var(--off-white);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--gray-dark);
+    text-transform: uppercase;
+  }
+  .type-btn:hover { border-color: var(--navy-mid); color: var(--navy); }
+  .type-btn.selected { border-color: var(--navy); background: var(--navy); color: var(--white); }
+  .type-btn .icon { font-size: 1.4rem; display: block; margin-bottom: 2px; }
+
+  /* Prioridade */
+  .priority-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+  .prio-btn {
+    padding: 0.6rem 0.4rem;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    text-align: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: all 0.18s;
+  }
+  .prio-btn .prio-label { display: block; }
+  .prio-btn .prio-desc { font-family: 'Barlow', sans-serif; font-size: 0.65rem; font-weight: 400; text-transform: none; letter-spacing: 0; opacity: 0.8; margin-top: 2px; display: block; }
+  .prio-baixa { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+  .prio-media { background: #fff8e1; color: #f57f17; border-color: #ffe082; }
+  .prio-alta  { background: #fff3e0; color: #e65100; border-color: #ffcc80; }
+  .prio-critica{ background: #ffebee; color: #b71c1c; border-color: #ef9a9a; }
+  .prio-btn.selected { box-shadow: 0 0 0 3px currentColor; opacity: 1; }
+  .prio-btn:not(.selected) { opacity: 0.65; }
+  .prio-btn:hover { opacity: 1; }
+
+  /* Upload */
+  .upload-area {
+    border: 2px dashed var(--gray-light);
+    border-radius: 10px;
+    padding: 1.2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--off-white);
+    position: relative;
+  }
+  .upload-area:hover { border-color: var(--navy-mid); background: #eef2f8; }
+  .upload-area input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .upload-icon { font-size: 1.8rem; }
+  .upload-text { font-size: 0.82rem; color: var(--gray-dark); margin-top: 4px; }
+  .upload-text strong { color: var(--navy); }
+  .file-list { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .file-tag {
+    background: var(--navy);
+    color: var(--white);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .file-tag button { background: none; border: none; color: var(--gray); cursor: pointer; font-size: 0.85rem; padding: 0; line-height: 1; }
+
+  /* Submit */
+  .btn-submit {
+    width: 100%;
+    padding: 1rem;
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 2rem;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 4px 16px rgba(204,34,34,0.3);
+  }
+  .btn-submit:hover { background: var(--red-dark); transform: translateY(-1px); }
+  .btn-submit:active { transform: translateY(0); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 2rem; right: 2rem;
+    background: var(--navy);
+    color: var(--white);
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    box-shadow: var(--shadow-lg);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 999;
+    border-left: 4px solid var(--red);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ── LOGIN ── */
+  .login-wrap {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+    padding: 2rem;
+  }
+  .login-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: var(--shadow-lg);
+  }
+  .login-logo {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .login-logo .logo-big {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .login-logo .logo-big span { color: var(--red); }
+  .login-logo p { font-size: 0.8rem; color: var(--gray); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
+  .login-card h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .login-field { margin-bottom: 1rem; }
+  .login-field label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--navy); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+  .login-field input {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 1.5px solid var(--gray-light);
+    border-radius: 8px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.95rem;
+    color: var(--navy);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .login-field input:focus { border-color: var(--navy-mid); }
+  .btn-login {
+    width: 100%;
+    padding: 0.85rem;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: background 0.2s;
+  }
+  .btn-login:hover { background: var(--red); }
+  .login-hint { font-size: 0.75rem; color: var(--gray); text-align: center; margin-top: 1rem; }
+
+  /* ── DASHBOARD ── */
+  .dash-page { padding: 2rem; max-width: 1200px; margin: 0 auto; }
+  .dash-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .dash-header h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .dash-header h2 span { color: var(--red); }
+  .dash-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* KPIs */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  .kpi-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1.2rem 1.4rem;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--gray-light);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .kpi-card.red { border-left-color: var(--red); }
+  .kpi-card.navy { border-left-color: var(--navy); }
+  .kpi-card.orange { border-left-color: #e65100; }
+  .kpi-card.green { border-left-color: #2e7d32; }
+  .kpi-label { font-size: 0.72rem; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.08em; }
+  .kpi-value { font-family: 'Barlow Condensed', sans-serif; font-size: 2.2rem; font-weight: 800; color: var(--navy); line-height: 1; }
+  .kpi-sub { font-size: 0.75rem; color: var(--gray); }
+
+  /* Filtros */
+  .filters-bar {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1rem 1.4rem;
+    box-shadow: var(--shadow);
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 1.2rem;
+  }
+  .filter-group { display: flex; align-items: center; gap: 8px; }
+  .filter-group label { font-size: 0.75rem; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  .filter-group select, .filter-group input {
+    border: 1.5px solid var(--gray-light);
+    border-radius: 6px;
+    padding: 0.4rem 0.7rem;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.85rem;
+    color: var(--navy);
+    outline: none;
+    background: var(--off-white);
+  }
+  .btn-export {
+    margin-left: auto;
+    padding: 0.5rem 1.2rem;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 7px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-export:hover { background: var(--red); }
+
+  /* Tabela */
+  .table-wrap {
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: var(--navy); }
+  thead th {
+    padding: 0.85rem 1rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-align: left;
+    white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid var(--gray-light); transition: background 0.15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f0f4fa; cursor: pointer; }
+  tbody td { padding: 0.85rem 1rem; font-size: 0.88rem; color: var(--navy); vertical-align: middle; }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .badge-baixa { background: #e8f5e9; color: #2e7d32; }
+  .badge-media { background: #fff8e1; color: #f57f17; }
+  .badge-alta  { background: #fff3e0; color: #e65100; }
+  .badge-critica{ background: #ffebee; color: #b71c1c; }
+  .badge-recebido { background: #e3f2fd; color: #1565c0; }
+  .badge-analise { background: #fff8e1; color: #f57f17; }
+  .badge-aprovado { background: #e8f5e9; color: #2e7d32; }
+  .badge-concluido { background: #f3e5f5; color: #6a1b9a; }
+  .badge-pecas { background: #e8eaf6; color: #283593; }
+  .badge-servico { background: #fce4ec; color: #880e4f; }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(13,31,60,0.6);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--white);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 620px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-header {
+    background: var(--navy);
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 16px 16px 0 0;
+  }
+  .modal-header h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .modal-close {
+    background: none; border: none; color: var(--gray); font-size: 1.3rem; cursor: pointer; line-height: 1;
+  }
+  .modal-close:hover { color: var(--white); }
+  .modal-body { padding: 1.5rem; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.2rem; }
+  .detail-item label { font-size: 0.72rem; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 3px; }
+  .detail-item .val { font-size: 0.92rem; color: var(--navy); font-weight: 500; }
+  .detail-desc { margin-bottom: 1.2rem; }
+  .detail-desc label { font-size: 0.72rem; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 6px; }
+  .detail-desc p { font-size: 0.9rem; color: var(--navy); background: var(--off-white); padding: 0.8rem; border-radius: 8px; line-height: 1.5; }
+
+  .status-select-row { display: flex; gap: 10px; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; }
+  .status-select-row label { font-size: 0.78rem; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+  .status-select-row select {
+    border: 1.5px solid var(--gray-light);
+    border-radius: 7px;
+    padding: 0.5rem 0.8rem;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.9rem;
+    color: var(--navy);
+    outline: none;
+  }
+  .btn-save-status {
+    padding: 0.5rem 1.1rem;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 7px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-save-status:hover { background: var(--red); }
+
+  .comments-section label { font-size: 0.78rem; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 8px; }
+  .comment-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; max-height: 150px; overflow-y: auto; }
+  .comment-item {
+    background: var(--off-white);
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+    color: var(--navy);
+    border-left: 3px solid var(--navy-mid);
+  }
+  .comment-item .comment-meta { font-size: 0.7rem; color: var(--gray); margin-bottom: 3px; }
+  .comment-input-row { display: flex; gap: 8px; }
+  .comment-input-row input {
+    flex: 1;
+    border: 1.5px solid var(--gray-light);
+    border-radius: 7px;
+    padding: 0.5rem 0.8rem;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.88rem;
+    color: var(--navy);
+    outline: none;
+  }
+  .comment-input-row input:focus { border-color: var(--navy-mid); }
+  .btn-comment {
+    padding: 0.5rem 1rem;
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    border-radius: 7px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .btn-comment:hover { background: var(--red-dark); }
+
+  /* Logout btn */
+  .btn-logout {
+    padding: 0.45rem 1rem;
+    background: rgba(255,255,255,0.08);
+    color: var(--gray);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-logout:hover { background: rgba(204,34,34,0.2); color: var(--white); border-color: var(--red); }
+
+  .no-data { text-align: center; padding: 3rem; color: var(--gray); font-size: 0.95rem; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .form-row.cols-2 { grid-template-columns: 1fr; }
+    .priority-grid { grid-template-columns: repeat(2, 1fr); }
+    .detail-grid { grid-template-columns: 1fr; }
+    .nav-tab .tab-label { display: none; }
+    .dash-page { padding: 1rem; }
+    .form-card { padding: 1.5rem; }
+    table { font-size: 0.8rem; }
+    thead th, tbody td { padding: 0.6rem 0.6rem; }
+  }
+  @media (max-width: 480px) {
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .header-subtitle { display: none; }
+  }
+
+  /* ── CHARTS ── */
+  .charts-section {
+    margin-bottom: 1.5rem;
+  }
+  .charts-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+  .charts-header h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .charts-header h3 span { color: var(--red); }
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+  .charts-grid-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .chart-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1.2rem 1.4rem;
+    box-shadow: var(--shadow);
+  }
+  .chart-card-full {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1.2rem 1.4rem;
+    box-shadow: var(--shadow);
+  }
+  .chart-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--gray-light);
+    padding-bottom: 0.5rem;
+  }
+  .chart-title span { color: var(--red); }
+  .chart-container { position: relative; height: 260px; }
+  .chart-container-lg { position: relative; height: 200px; }
+  @media (max-width: 768px) {
+    .charts-grid, .charts-grid-bottom { grid-template-columns: 1fr; }
+    .chart-container, .chart-container-lg { height: 200px; }
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-area">
+      <!-- Makro logo: X symbol + MAKRO text -->
+      <svg class="logo-icon" viewBox="0 0 120 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- X symbol: two crossing arrow-chevrons in red -->
+        <!-- Left chevron (pointing right) top-left to center -->
+        <polyline points="2,4 16,22 2,40" stroke="#cc2222" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <!-- Right chevron (pointing right) -->
+        <polyline points="12,4 26,22 12,40" stroke="#cc2222" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <!-- MAKRO text in white -->
+        <text x="34" y="31" font-family="'Barlow Condensed', Arial Black, sans-serif" font-size="26" font-weight="800" fill="white" letter-spacing="1">MAKRO</text>
+      </svg>
+      <div>
+        <div class="header-subtitle">Engenharia — Manutenção</div>
+      </div>
+    </div>
+    <nav class="nav-tabs">
+      <button class="nav-tab active" onclick="showView('form-view')" id="tab-form">
+        📋 <span class="tab-label">Solicitação</span>
+      </button>
+      <button class="nav-tab" onclick="showView('pcm-view')" id="tab-pcm">
+        📊 <span class="tab-label">Painel PCM</span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<!-- ══════════ FORMULÁRIO ══════════ -->
+<div id="form-view" class="view active">
+  <div class="form-page">
+    <div class="form-hero">
+      <svg viewBox="0 0 160 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:32px;width:auto;margin-bottom:10px;">
+        <polyline points="2,3 14,20 2,37" stroke="#e63333" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <polyline points="12,3 24,20 12,37" stroke="#e63333" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <text x="32" y="28" font-family="'Barlow Condensed', Arial Black, sans-serif" font-size="24" font-weight="800" fill="white" letter-spacing="1">MAKRO</text>
+      </svg>
+      <h1>Solicitação de<br><span>Peças & Serviços</span></h1>
+      <p>Preencha todos os campos para registrar sua solicitação ao PCM</p>
+    </div>
+    <div class="form-card">
+
+      <div class="section-divider"><span class="label">Identificação do Solicitante</span><span class="line"></span></div>
+      <div class="form-row cols-2">
+        <div class="field">
+          <label>Nome Completo <span class="req">*</span></label>
+          <input type="text" id="f-nome" placeholder="Seu nome completo">
+        </div>
+        <div class="field">
+          <label>Matrícula <span class="req">*</span></label>
+          <input type="text" id="f-matricula" placeholder="Ex: 00123">
+        </div>
+      </div>
+
+      <div class="section-divider"><span class="label">Identificação do Equipamento</span><span class="line"></span></div>
+      <div class="form-row cols-2">
+        <div class="field">
+          <label>TAG do Equipamento <span class="req">*</span></label>
+          <input type="text" id="f-tag" placeholder="Ex: EXC-001">
+        </div>
+        <div class="field">
+          <label>Horímetro / Hodômetro <span class="req">*</span></label>
+          <input type="text" id="f-horimetro" placeholder="Ex: 1.245 h ou 32.500 km">
+        </div>
+      </div>
+
+      <div class="section-divider"><span class="label">Tipo de Solicitação</span><span class="line"></span></div>
+      <div class="type-selector" id="tipo-selector">
+        <div class="type-btn" onclick="selectTipo('Peças')" id="tipo-pecas">
+          <span class="icon">🔩</span>
+          Peças
+        </div>
+        <div class="type-btn" onclick="selectTipo('Serviço')" id="tipo-servico">
+          <span class="icon">🔧</span>
+          Serviço
+        </div>
+      </div>
+
+      <div class="section-divider"><span class="label">Prioridade</span><span class="line"></span></div>
+      <div class="priority-grid">
+        <div class="prio-btn prio-baixa" onclick="selectPrio('Baixa')" id="prio-Baixa">
+          <span class="prio-label">🟢 Baixa</span>
+          <span class="prio-desc">Sem impacto imediato na operação</span>
+        </div>
+        <div class="prio-btn prio-media" onclick="selectPrio('Média')" id="prio-Média">
+          <span class="prio-label">🟡 Média</span>
+          <span class="prio-desc">Pode impactar em breve</span>
+        </div>
+        <div class="prio-btn prio-alta" onclick="selectPrio('Alta')" id="prio-Alta">
+          <span class="prio-label">🟠 Alta</span>
+          <span class="prio-desc">Impacto imediato na produção</span>
+        </div>
+        <div class="prio-btn prio-critica" onclick="selectPrio('Crítica')" id="prio-Crítica">
+          <span class="prio-label">🔴 Crítica</span>
+          <span class="prio-desc">Equipamento parado / risco</span>
+        </div>
+      </div>
+
+      <div class="section-divider"><span class="label">Descrição</span><span class="line"></span></div>
+      <div class="form-row cols-1">
+        <div class="field">
+          <label>Descrição do Item ou Serviço <span class="req">*</span></label>
+          <textarea id="f-descricao" placeholder="Descreva detalhadamente o item necessário ou o serviço a ser realizado..."></textarea>
+        </div>
+      </div>
+
+      <div class="section-divider"><span class="label">Anexos</span><span class="line"></span></div>
+      <div class="form-row cols-2">
+        <div class="field">
+          <label>Foto da Peça / Problema</label>
+          <div class="upload-area" id="upload-foto">
+            <input type="file" accept="image/*" onchange="handleFile(this,'foto')" multiple>
+            <div class="upload-icon">📷</div>
+            <div class="upload-text"><strong>Clique ou arraste</strong><br>Imagens da peça ou problema</div>
+            <div class="file-list" id="files-foto"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Orçamento (se disponível)</label>
+          <div class="upload-area" id="upload-orcamento">
+            <input type="file" accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls,.doc,.docx" onchange="handleFile(this,'orcamento')" multiple>
+            <div class="upload-icon">📄</div>
+            <div class="upload-text"><strong>Clique ou arraste</strong><br>PDF, imagem ou planilha</div>
+            <div class="file-list" id="files-orcamento"></div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-submit" onclick="submitForm()">📨 Enviar Solicitação ao PCM</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ PCM VIEW ══════════ -->
+<div id="pcm-view" class="view">
+
+  <!-- LOGIN -->
+  <div id="pcm-login" class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">
+        <svg viewBox="0 0 160 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:48px;width:auto;margin-bottom:4px;">
+          <polyline points="2,5 18,26 2,47" stroke="#cc2222" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <polyline points="14,5 30,26 14,47" stroke="#cc2222" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <text x="40" y="37" font-family="'Barlow Condensed', Arial Black, sans-serif" font-size="32" font-weight="800" fill="#0d1f3c" letter-spacing="1">MAKRO</text>
+        </svg>
+        <p>Painel PCM — Manutenção</p>
+      </div>
+      <h2>Acesso Restrito</h2>
+      <div class="login-field">
+        <label>Usuário</label>
+        <input type="text" id="login-user" placeholder="seu.usuario" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="login-field">
+        <label>Senha</label>
+        <input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="btn-login" onclick="doLogin()">Entrar no Painel</button>
+      <p class="login-hint">Acesso exclusivo para equipe PCM<br><small>Demo: usuário <b>pcm</b> / senha <b>makro123</b></small></p>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="pcm-dash" style="display:none;">
+    <div class="dash-page">
+      <div class="dash-header">
+        <div>
+          <h2>Painel <span>PCM</span></h2>
+          <div style="font-size:0.8rem;color:var(--gray);margin-top:2px;" id="dash-user-label"></div>
+        </div>
+        <div class="dash-actions">
+          <button class="btn-export" onclick="loadDashboard()" style="background:var(--navy-mid);">🔄 Atualizar</button>
+          <button class="btn-export" onclick="exportExcel()">⬇ Exportar Excel</button>
+          <button class="btn-logout" onclick="doLogout()">Sair</button>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card navy">
+          <div class="kpi-label">Total</div>
+          <div class="kpi-value" id="kpi-total">0</div>
+          <div class="kpi-sub">solicitações</div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-label">Críticas</div>
+          <div class="kpi-value" id="kpi-critica">0</div>
+          <div class="kpi-sub">prioridade crítica</div>
+        </div>
+        <div class="kpi-card orange">
+          <div class="kpi-label">Em Aberto</div>
+          <div class="kpi-value" id="kpi-aberto">0</div>
+          <div class="kpi-sub">recebido + análise</div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-label">Concluídas</div>
+          <div class="kpi-value" id="kpi-concluido">0</div>
+          <div class="kpi-sub">este mês</div>
+        </div>
+      </div>
+
+
+      <!-- CHARTS -->
+      <div class="charts-section">
+        <div class="charts-header">
+          <h3>Análise <span>Gráfica</span></h3>
+          <div style="flex:1;height:1px;background:var(--gray-light);"></div>
+        </div>
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-title">📊 Solicitações por <span>Status</span></div>
+            <div class="chart-container"><canvas id="chart-status"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">🎯 Solicitações por <span>Prioridade</span></div>
+            <div class="chart-container"><canvas id="chart-prio"></canvas></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Filtros -->
+      <div class="filters-bar">
+        <div class="filter-group">
+          <label>Prioridade</label>
+          <select id="filt-prio" onchange="renderTable()">
+            <option value="">Todas</option>
+            <option>Baixa</option><option>Média</option><option>Alta</option><option>Crítica</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Tipo</label>
+          <select id="filt-tipo" onchange="renderTable()">
+            <option value="">Todos</option>
+            <option>Peças</option><option>Serviço</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Status</label>
+          <select id="filt-status" onchange="renderTable()">
+            <option value="">Todos</option>
+            <option>Recebido</option><option>Em Análise</option><option>Aprovado</option><option>Concluído</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Data</label>
+          <input type="date" id="filt-data" onchange="renderTable()">
+        </div>
+        <button class="btn-export" style="background:var(--gray-dark);margin-left:0;" onclick="clearFilters()">✕ Limpar</button>
+      </div>
+
+      <!-- Tabela -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Data / Hora</th>
+              <th>Solicitante</th>
+              <th>TAG</th>
+              <th>Tipo</th>
+              <th>Prioridade</th>
+              <th>Status</th>
+              <th style="color:#7eb3ff;">SA</th>
+              <th style="color:#81c784;">SC</th>
+              <th style="color:#ce93d8;">IP</th>
+              <th>Descrição</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+        <div class="no-data" id="no-data" style="display:none;">Nenhuma solicitação encontrada.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL DETALHE ══════════ -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3 id="modal-title">Detalhes da Solicitação</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-grid" id="modal-grid"></div>
+      <div class="detail-desc">
+        <label>Descrição</label>
+        <p id="modal-desc"></p>
+      </div>
+      <div class="status-select-row">
+        <label>Status:</label>
+        <select id="modal-status">
+          <option>Recebido</option>
+          <option>Em Análise</option>
+          <option>Aprovado</option>
+          <option>Concluído</option>
+        </select>
+        <button class="btn-save-status" onclick="saveStatus()">Salvar Status</button>
+      </div>
+      <div class="comments-section" id="modal-anexos-section" style="margin-bottom:1.2rem;">
+        <label style="font-size:0.78rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:8px;">📎 Anexos</label>
+        <div id="modal-anexos-list" style="display:flex;flex-wrap:wrap;gap:8px;min-height:32px;">
+          <span style="font-size:0.8rem;color:var(--gray);">Nenhum anexo enviado.</span>
+        </div>
+      </div>
+      <div class="comments-section">
+        <label>Observações Internas do PCM</label>
+        <div class="comment-list" id="modal-comments"></div>
+        <div class="comment-input-row">
+          <input type="text" id="comment-input" placeholder="Adicionar observação (fornecedor, prazo, decisão...)">
+          <button class="btn-comment" onclick="addComment()">+ Registrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TOAST ══════════ -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── CONFIG ──
+  const API_URL = 'https://script.google.com/macros/s/AKfycby9gNVu4xHGTKD2BlyLft8i90Qi72SG4o4QcJn2-OoeM_o0qI0jAACEcJEksL9vb8tn/exec';
+
+  // ── STATE ──
+  let solicitacoes = [];
+  let selectedTipo = '';
+  let selectedPrio = '';
+  let currentModalId = null;
+  let currentUser = '';
+  const users = { pcm: 'makro123', 'pcm.planejamento': 'makro123', 'admin.pcm': 'makro2024' };
+
+  // ── API ──
+  async function apiGet() {
+    try {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
+    } catch(e) { console.error('Erro ao buscar dados:', e); return []; }
+  }
+
+  async function apiPost(payload) {
+    return new Promise((resolve) => {
+      try {
+        const cbName = 'cb_' + Date.now();
+        const url = API_URL + '?callback=' + cbName + '&data=' + encodeURIComponent(JSON.stringify(payload));
+        window[cbName] = (res) => {
+          delete window[cbName];
+          document.getElementById(cbName) && document.getElementById(cbName).remove();
+          resolve(true);
+        };
+        const script = document.createElement('script');
+        script.id = cbName;
+        script.src = url;
+        script.onerror = () => { delete window[cbName]; script.remove(); resolve(false); };
+        document.body.appendChild(script);
+        setTimeout(() => { if (window[cbName]) { delete window[cbName]; script.remove(); resolve(true); } }, 8000);
+      } catch(e) { console.error('Erro:', e); resolve(false); }
+    });
+  }
+
+  function formatDate(raw) {
+    if (!raw) return '';
+    // Already formatted dd/mm/yyyy hh:mm
+    if (typeof raw === 'string' && raw.includes('/')) return raw;
+    // ISO format from Sheets
+    try {
+      const d = new Date(raw);
+      if (isNaN(d)) return String(raw);
+      return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+    } catch { return String(raw); }
+  }
+
+  function parseRow(row) {
+    // Suporta tanto objeto com chaves quanto array posicional
+    if (Array.isArray(row)) {
+      return {
+        id: row[0], data: row[1], nome: row[2], matricula: row[3],
+        tag: row[4], horimetro: row[5], tipo: row[6], prioridade: row[7],
+        status: row[8] || 'Recebido', descricao: row[9] || '',
+        comments: parseComments(row[10]),
+        sa: row[11] || '', sc: row[12] || '', ip: row[13] || ''
+      };
+    }
+    return {
+      id: row['ID'] || row.id,
+      data: formatDate(row['Data/Hora'] || row.data),
+      nome: row['Nome'] || row.nome,
+      matricula: row['Matrícula'] || row.matricula,
+      tag: row['TAG'] || row.tag,
+      horimetro: row['Horímetro'] || row.horimetro,
+      tipo: row['Tipo'] || row.tipo,
+      prioridade: row['Prioridade'] || row.prioridade,
+      status: row['Status'] || row.status || 'Recebido',
+      descricao: row['Descrição'] || row.descricao || '',
+      comments: parseComments(row['Comentários'] || row.comentarios),
+      sa: row['SA'] || row.sa || '',
+      sc: row['SC'] || row.sc || '',
+      ip: row['IP'] || row.ip || '',
+      anexos: parseAnexos(row['Anexos'] || row.anexos)
+    };
+  }
+
+  function parseComments(raw) {
+    if (!raw || raw === '') return [];
+    try { return JSON.parse(raw); } catch { return []; }
+  }
+
+  function parseAnexos(raw) {
+    if (!raw || raw === '') return [];
+    try {
+      // Format: JSON strings separated by ||
+      const parts = String(raw).split('||');
+      return parts.map(p => {
+        try { return JSON.parse(p.trim()); } catch { return null; }
+      }).filter(Boolean);
+    } catch { return []; }
+  }
+
+  function setLoading(show, msg) {
+    let el = document.getElementById('loading-overlay');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'loading-overlay';
+      el.style.cssText = 'position:fixed;inset:0;background:rgba(13,31,60,0.55);z-index:500;display:flex;align-items:center;justify-content:center;';
+      el.innerHTML = `<div style="background:#fff;border-radius:12px;padding:2rem 2.5rem;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.2);">
+        <div style="font-size:2rem;margin-bottom:0.5rem;">⏳</div>
+        <div id="loading-msg" style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;color:#0d1f3c;letter-spacing:0.04em;text-transform:uppercase;">${msg||'Carregando...'}</div>
+      </div>`;
+      document.body.appendChild(el);
+    }
+    el.style.display = show ? 'flex' : 'none';
+    if (msg) document.getElementById('loading-msg').textContent = msg;
+  }
+
+  // ── VIEWS ──
+  function showView(v) {
+    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+    document.getElementById(v).classList.add('active');
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    if (v === 'form-view') document.getElementById('tab-form').classList.add('active');
+    if (v === 'pcm-view') document.getElementById('tab-pcm').classList.add('active');
+  }
+
+  // ── FORM ──
+  function selectTipo(t) {
+    selectedTipo = t;
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('tipo-' + t.toLowerCase().replace('ç','c').replace('ã','a')).classList.add('selected');
+  }
+  function selectPrio(p) {
+    selectedPrio = p;
+    document.querySelectorAll('.prio-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('prio-' + p).classList.add('selected');
+  }
+  // Store files for upload after form submission
+  const pendingFiles = { foto: [], orcamento: [] };
+
+  function handleFile(input, type) {
+    const list = document.getElementById('files-' + type);
+    list.innerHTML = '';
+    pendingFiles[type] = Array.from(input.files);
+    pendingFiles[type].forEach(f => {
+      const tag = document.createElement('div');
+      tag.className = 'file-tag';
+      tag.innerHTML = `📎 ${f.name.length > 18 ? f.name.substring(0,18)+'…' : f.name}`;
+      list.appendChild(tag);
+    });
+  }
+
+  async function uploadFiles(solicitacaoId) {
+    const allFiles = [
+      ...pendingFiles.foto.map(f => ({ file: f, fileType: 'foto' })),
+      ...pendingFiles.orcamento.map(f => ({ file: f, fileType: 'orcamento' }))
+    ];
+    if (allFiles.length === 0) return;
+    for (const { file, fileType } of allFiles) {
+      try {
+        setLoading(true, `Enviando ${fileType === 'foto' ? 'foto' : 'orçamento'}: ${file.name}...`);
+        const base64 = await fileToBase64(file);
+        // Send as single JSONP call with full base64
+        await new Promise((resolve) => {
+          const cbName = 'upcb_' + Date.now();
+          const payload = {
+            action: 'upload_chunk',
+            solicitacaoId: String(solicitacaoId),
+            fileName: file.name,
+            mimeType: file.type || 'application/octet-stream',
+            fileType,
+            chunk: base64,
+            chunkIndex: 0,
+            totalChunks: 1
+          };
+          window[cbName] = () => { delete window[cbName]; const el=document.getElementById(cbName); if(el)el.remove(); resolve(true); };
+          const script = document.createElement('script');
+          script.id = cbName;
+          script.src = API_URL + '?callback=' + cbName + '&data=' + encodeURIComponent(JSON.stringify(payload));
+          script.onerror = () => { delete window[cbName]; script.remove(); resolve(false); };
+          document.body.appendChild(script);
+          setTimeout(() => { if(window[cbName]){ delete window[cbName]; const el=document.getElementById(cbName); if(el)el.remove(); resolve(true); } }, 60000);
+        });
+      } catch(err) {
+        console.error('Erro no upload:', err);
+      }
+    }
+    pendingFiles.foto = [];
+    pendingFiles.orcamento = [];
+  }
