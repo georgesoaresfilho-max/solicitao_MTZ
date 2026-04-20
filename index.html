@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Makro Engenharia — Manutenção</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0d1f3c;--navy-mid:#1a3260;--red:#cc2222;--red-dark:#a01818;--white:#fff;--off:#f4f6f9;--gray:#8a9ab5;--gray-light:#e2e8f0;--gray-dark:#4a5568;--shadow:0 4px 24px rgba(13,31,60,.10);--shadow-lg:0 8px 40px rgba(13,31,60,.18)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Barlow',sans-serif;background:var(--off);color:var(--navy);min-height:100vh}
+header{background:var(--navy);position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.25)}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:64px}
+.logo-area{display:flex;align-items:center;gap:14px}
+.logo-sub{font-size:.72rem;color:var(--gray);letter-spacing:.12em;text-transform:uppercase;font-weight:500}
+.nav-tabs{display:flex;height:64px}
+.nav-tab{display:flex;align-items:center;gap:8px;padding:0 1.4rem;color:var(--gray);font-size:.9rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;transition:all .2s;font-family:'Barlow Condensed',sans-serif}
+.nav-tab:hover{color:var(--white);background:rgba(255,255,255,.05)}
+.nav-tab.active{color:var(--white);border-bottom-color:var(--red);background:rgba(204,34,34,.08)}
+.view{display:none}.view.active{display:block}
+.form-page{max-width:720px;margin:2.5rem auto;padding:0 1rem 3rem}
+.form-hero{background:linear-gradient(135deg,var(--navy) 60%,var(--navy-mid));border-radius:16px 16px 0 0;padding:2rem 2.5rem 1.5rem;position:relative;overflow:hidden}
+.form-hero::before{content:'';position:absolute;top:-30px;right:-30px;width:160px;height:160px;border:28px solid rgba(204,34,34,.15);border-radius:50%}
+.form-hero h1{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:var(--white);text-transform:uppercase;line-height:1.1}
+.form-hero h1 span{color:#e63333}
+.form-hero p{color:var(--gray);font-size:.88rem;margin-top:.4rem}
+.form-card{background:var(--white);border-radius:0 0 16px 16px;padding:2.5rem;box-shadow:var(--shadow-lg)}
+.sec-div{display:flex;align-items:center;gap:10px;margin:1.8rem 0 1rem}
+.sec-div .lbl{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--red);white-space:nowrap}
+.sec-div .ln{flex:1;height:1px;background:var(--gray-light)}
+.row{display:grid;gap:1rem;margin-bottom:1rem}
+.row.c2{grid-template-columns:1fr 1fr}.row.c1{grid-template-columns:1fr}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:.78rem;font-weight:600;color:var(--navy);letter-spacing:.06em;text-transform:uppercase}
+.field label .req{color:var(--red)}
+.field input,.field select,.field textarea{border:1.5px solid var(--gray-light);border-radius:8px;padding:.65rem .9rem;font-family:'Barlow',sans-serif;font-size:.92rem;color:var(--navy);background:var(--off);transition:border-color .2s,box-shadow .2s;outline:none;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--navy-mid);box-shadow:0 0 0 3px rgba(26,50,96,.10);background:var(--white)}
+.field textarea{resize:vertical;min-height:90px}
+.type-sel{display:flex;gap:10px}
+.type-btn{flex:1;padding:.75rem;border:2px solid var(--gray-light);border-radius:10px;background:var(--off);cursor:pointer;text-align:center;transition:all .2s;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.05em;color:var(--gray-dark);text-transform:uppercase}
+.type-btn:hover{border-color:var(--navy-mid);color:var(--navy)}
+.type-btn.selected{border-color:var(--navy);background:var(--navy);color:var(--white)}
+.type-btn .ico{font-size:1.4rem;display:block;margin-bottom:2px}
+.prio-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.prio-btn{padding:.6rem .4rem;border-radius:8px;border:2px solid transparent;cursor:pointer;text-align:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.92rem;letter-spacing:.04em;text-transform:uppercase;transition:all .18s}
+.prio-btn .pl{display:block}.prio-btn .pd{font-family:'Barlow',sans-serif;font-size:.63rem;font-weight:400;text-transform:none;letter-spacing:0;opacity:.8;margin-top:2px;display:block}
+.pb{background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7}
+.pm{background:#fff8e1;color:#f57f17;border-color:#ffe082}
+.pa{background:#fff3e0;color:#e65100;border-color:#ffcc80}
+.pc{background:#ffebee;color:#b71c1c;border-color:#ef9a9a}
+.prio-btn.selected{box-shadow:0 0 0 3px currentColor}.prio-btn:not(.selected){opacity:.6}.prio-btn:hover{opacity:1}
+.upload-box{border:2px dashed var(--gray-light);border-radius:10px;padding:1.2rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--off);position:relative}
+.upload-box:hover{border-color:var(--navy-mid);background:#eef2f8}
+.upload-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-ico{font-size:1.8rem}.upload-txt{font-size:.82rem;color:var(--gray-dark);margin-top:4px}
+.upload-txt strong{color:var(--navy)}
+.file-list{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+.file-tag{background:var(--navy);color:var(--white);border-radius:20px;padding:3px 10px;font-size:.75rem}
+.btn-submit{width:100%;padding:1rem;background:var(--red);color:var(--white);border:none;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:1.15rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;margin-top:1.5rem;transition:background .2s,transform .1s;box-shadow:0 4px 16px rgba(204,34,34,.3)}
+.btn-submit:hover{background:var(--red-dark);transform:translateY(-1px)}
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--navy);color:var(--white);padding:1rem 1.5rem;border-radius:10px;box-shadow:var(--shadow-lg);font-size:.9rem;font-weight:500;transform:translateY(80px);opacity:0;transition:all .3s;z-index:999;border-left:4px solid var(--red)}
+.toast.show{transform:translateY(0);opacity:1}
+#loading{position:fixed;inset:0;background:rgba(13,31,60,.55);z-index:500;display:none;align-items:center;justify-content:center}
+#loading.show{display:flex}
+.ld-card{background:var(--white);border-radius:12px;padding:2rem 2.5rem;text-align:center;box-shadow:var(--shadow-lg)}
+.ld-card .spin{font-size:2rem;animation:spin 1s linear infinite;display:block;margin-bottom:.5rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ld-card p{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.04em}
+.login-wrap{min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy),var(--navy-mid));padding:2rem}
+.login-card{background:var(--white);border-radius:16px;padding:2.5rem;width:100%;max-width:400px;box-shadow:var(--shadow-lg)}
+.login-logo{text-align:center;margin-bottom:2rem}
+.login-logo p{font-size:.78rem;color:var(--gray);letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
+.login-card h2{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:800;color:var(--navy);margin-bottom:1.5rem;text-align:center;letter-spacing:.04em;text-transform:uppercase}
+.lf{margin-bottom:1rem}
+.lf label{display:block;font-size:.78rem;font-weight:600;color:var(--navy);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.lf input{width:100%;padding:.7rem 1rem;border:1.5px solid var(--gray-light);border-radius:8px;font-family:'Barlow',sans-serif;font-size:.95rem;color:var(--navy);outline:none;transition:border-color .2s}
+.lf input:focus{border-color:var(--navy-mid)}
+.btn-login{width:100%;padding:.85rem;background:var(--navy);color:var(--white);border:none;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;margin-top:.5rem;transition:background .2s}
+.btn-login:hover{background:var(--red)}
+.login-hint{font-size:.75rem;color:var(--gray);text-align:center;margin-top:1rem}
+.dash{padding:2rem;max-width:1300px;margin:0 auto}
+.dash-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem}
+.dash-hdr h2{font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:900;color:var(--navy);text-transform:uppercase;letter-spacing:.03em}
+.dash-hdr h2 span{color:var(--red)}
+.dash-actions{display:flex;gap:8px;flex-wrap:wrap}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+.kpi{background:var(--white);border-radius:12px;padding:1.2rem 1.4rem;box-shadow:var(--shadow);border-left:4px solid var(--gray-light)}
+.kpi.k-navy{border-left-color:var(--navy)}.kpi.k-red{border-left-color:var(--red)}.kpi.k-orange{border-left-color:#e65100}.kpi.k-green{border-left-color:#2e7d32}
+.kpi-lbl{font-size:.72rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.08em}
+.kpi-val{font-family:'Barlow Condensed',sans-serif;font-size:2.4rem;font-weight:900;color:var(--navy);line-height:1}
+.kpi-sub{font-size:.75rem;color:var(--gray)}
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.chart-card{background:var(--white);border-radius:12px;padding:1.2rem 1.4rem;box-shadow:var(--shadow)}
+.chart-title{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.8rem;padding-bottom:.5rem;border-bottom:2px solid var(--gray-light)}
+.chart-title span{color:var(--red)}
+.chart-box{position:relative;height:220px}
+.filters{background:var(--white);border-radius:12px;padding:1rem 1.4rem;box-shadow:var(--shadow);display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-bottom:1.2rem}
+.fg{display:flex;align-items:center;gap:8px}
+.fg label{font-size:.74rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.fg select,.fg input{border:1.5px solid var(--gray-light);border-radius:6px;padding:.4rem .7rem;font-family:'Barlow',sans-serif;font-size:.85rem;color:var(--navy);outline:none;background:var(--off)}
+.btn{padding:.5rem 1.1rem;border:none;border-radius:7px;font-family:'Barlow Condensed',sans-serif;font-size:.88rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-navy{background:var(--navy);color:var(--white)}.btn-navy:hover{background:var(--navy-mid)}
+.btn-red{background:var(--red);color:var(--white)}.btn-red:hover{background:var(--red-dark)}
+.btn-gray{background:var(--gray-dark);color:var(--white)}.btn-gray:hover{background:#2d3748}
+.btn-out{background:rgba(255,255,255,.08);color:var(--gray);border:1px solid rgba(255,255,255,.12)}.btn-out:hover{background:rgba(204,34,34,.2);color:var(--white);border-color:var(--red)}
+.tbl-wrap{background:var(--white);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--navy)}
+thead th{padding:.85rem 1rem;font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;text-align:left;white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--gray-light);transition:background .15s;cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#f0f4fa}
+tbody td{padding:.85rem 1rem;font-size:.88rem;color:var(--navy);vertical-align:middle}
+.no-data{text-align:center;padding:3rem;color:var(--gray)}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.b-baixa{background:#e8f5e9;color:#2e7d32}.b-media{background:#fff8e1;color:#f57f17}
+.b-alta{background:#fff3e0;color:#e65100}.b-critica{background:#ffebee;color:#b71c1c}
+.b-recebido{background:#e3f2fd;color:#1565c0}.b-emanalise{background:#fff8e1;color:#f57f17}
+.b-aprovado{background:#e8f5e9;color:#2e7d32}.b-concluido{background:#f3e5f5;color:#6a1b9a}
+.b-pecas{background:#e8eaf6;color:#283593}.b-servico{background:#fce4ec;color:#880e4f}
+.modal-overlay{position:fixed;inset:0;background:rgba(13,31,60,.6);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:16px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-hdr{background:var(--navy);padding:1.2rem 1.5rem;display:flex;align-items:center;justify-content:space-between;border-radius:16px 16px 0 0;position:sticky;top:0;z-index:1}
+.modal-hdr h3{font-family:'Barlow Condensed',sans-serif;font-size:1.15rem;font-weight:800;color:var(--white);text-transform:uppercase;letter-spacing:.04em}
+.modal-close{background:none;border:none;color:var(--gray);font-size:1.3rem;cursor:pointer;line-height:1}
+.modal-close:hover{color:var(--white)}
+.modal-body{padding:1.5rem}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem}
+.di label{font-size:.72rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:3px}
+.di .val{font-size:.92rem;color:var(--navy);font-weight:500}
+.desc-box{margin-bottom:1.2rem}
+.desc-box label{font-size:.72rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px}
+.desc-box p{font-size:.9rem;color:var(--navy);background:var(--off);padding:.8rem;border-radius:8px;line-height:1.5}
+.modal-sec{margin-bottom:1.2rem}
+.modal-sec>label{font-size:.78rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:8px}
+.status-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.status-row select{border:1.5px solid var(--gray-light);border-radius:7px;padding:.5rem .8rem;font-family:'Barlow',sans-serif;font-size:.9rem;color:var(--navy);outline:none}
+.comment-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;max-height:150px;overflow-y:auto}
+.comment-item{background:var(--off);border-radius:8px;padding:.6rem .8rem;font-size:.85rem;color:var(--navy);border-left:3px solid var(--navy-mid)}
+.comment-meta{font-size:.7rem;color:var(--gray);margin-bottom:3px}
+.comment-row{display:flex;gap:8px}
+.comment-row input{flex:1;border:1.5px solid var(--gray-light);border-radius:7px;padding:.5rem .8rem;font-family:'Barlow',sans-serif;font-size:.88rem;color:var(--navy);outline:none}
+.comment-row input:focus{border-color:var(--navy-mid)}
+.anexo-list{display:flex;flex-wrap:wrap;gap:8px;min-height:30px}
+.anexo-btn{display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:var(--white);border-radius:20px;padding:5px 12px;font-size:.78rem;font-weight:600;text-decoration:none;transition:background .2s}
+.anexo-btn:hover{background:var(--red)}
+@media(max-width:900px){.kpi-grid{grid-template-columns:1fr 1fr}.chart-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.row.c2{grid-template-columns:1fr}.prio-grid{grid-template-columns:1fr 1fr}.detail-grid{grid-template-columns:1fr}.dash{padding:1rem}.form-card{padding:1.5rem}.nav-tab .tl{display:none}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr">
+    <div class="logo-area">
+      <svg viewBox="0 0 140 44" fill="none" style="height:34px;width:auto">
+        <polyline points="2,4 16,22 2,40" stroke="#cc2222" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="13,4 27,22 13,40" stroke="#cc2222" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="35" y="31" font-family="'Barlow Condensed',Arial Black,sans-serif" font-size="27" font-weight="900" fill="white" letter-spacing="1">MAKRO</text>
+      </svg>
+      <div class="logo-sub">Engenharia — Manutenção</div>
+    </div>
+    <nav class="nav-tabs">
+      <button class="nav-tab active" onclick="showView('v-form')" id="tab-form">📋 <span class="tl">Solicitação</span></button>
+      <button class="nav-tab" onclick="showView('v-pcm')" id="tab-pcm">📊 <span class="tl">Painel PCM</span></button>
+    </nav>
+  </div>
+</header>
+
+<!-- FORMULÁRIO -->
+<div id="v-form" class="view active">
+  <div class="form-page">
+    <div class="form-hero">
+      <svg viewBox="0 0 140 36" fill="none" style="height:26px;width:auto;margin-bottom:10px">
+        <polyline points="2,3 13,18 2,33" stroke="#e63333" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="11,3 22,18 11,33" stroke="#e63333" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="30" y="25" font-family="'Barlow Condensed',Arial Black,sans-serif" font-size="22" font-weight="900" fill="white" letter-spacing="1">MAKRO</text>
+      </svg>
+      <h1>Solicitação de<br><span>Peças &amp; Serviços</span></h1>
+      <p>Preencha todos os campos para registrar sua solicitação ao PCM</p>
+    </div>
+    <div class="form-card">
+      <div class="sec-div"><span class="lbl">Identificação do Solicitante</span><span class="ln"></span></div>
+      <div class="row c2">
+        <div class="field"><label>Nome Completo <span class="req">*</span></label><input type="text" id="f-nome" placeholder="Seu nome completo"></div>
+        <div class="field"><label>Matrícula <span class="req">*</span></label><input type="text" id="f-mat" placeholder="Ex: 00123"></div>
+      </div>
+      <div class="sec-div"><span class="lbl">Identificação do Equipamento</span><span class="ln"></span></div>
+      <div class="row c2">
+        <div class="field"><label>TAG do Equipamento <span class="req">*</span></label><input type="text" id="f-tag" placeholder="Ex: EXC-001"></div>
+        <div class="field"><label>Horímetro / Hodômetro <span class="req">*</span></label><input type="text" id="f-hor" placeholder="Ex: 1.245 h"></div>
+      </div>
+      <div class="sec-div"><span class="lbl">Tipo de Solicitação</span><span class="ln"></span></div>
+      <div class="type-sel">
+        <div class="type-btn" onclick="selTipo('Peças')" id="t-Pecas"><span class="ico">🔩</span>Peças</div>
+        <div class="type-btn" onclick="selTipo('Serviço')" id="t-Servico"><span class="ico">🔧</span>Serviço</div>
+      </div>
+      <div class="sec-div"><span class="lbl">Prioridade</span><span class="ln"></span></div>
+      <div class="prio-grid">
+        <div class="prio-btn pb" onclick="selPrio('Baixa')" id="p-Baixa"><span class="pl">🟢 Baixa</span><span class="pd">Sem impacto imediato</span></div>
+        <div class="prio-btn pm" onclick="selPrio('Média')" id="p-Média"><span class="pl">🟡 Média</span><span class="pd">Pode impactar em breve</span></div>
+        <div class="prio-btn pa" onclick="selPrio('Alta')" id="p-Alta"><span class="pl">🟠 Alta</span><span class="pd">Impacto imediato</span></div>
+        <div class="prio-btn pc" onclick="selPrio('Crítica')" id="p-Crítica"><span class="pl">🔴 Crítica</span><span class="pd">Equipamento parado</span></div>
+      </div>
+      <div class="sec-div"><span class="lbl">Descrição</span><span class="ln"></span></div>
+      <div class="row c1">
+        <div class="field"><label>Descrição do Item ou Serviço <span class="req">*</span></label>
+          <textarea id="f-desc" placeholder="Descreva detalhadamente o item necessário ou o serviço a ser realizado..."></textarea>
+        </div>
+      </div>
+      <div class="sec-div"><span class="lbl">Anexos</span><span class="ln"></span></div>
+      <div class="row c2">
+        <div class="field">
+          <label>Foto da Peça / Problema</label>
+          <div class="upload-box">
+            <input type="file" accept="image/*" onchange="handleFile(this,'foto')" multiple>
+            <div class="upload-ico">📷</div>
+            <div class="upload-txt"><strong>Clique ou arraste</strong><br>Imagens da peça ou problema</div>
+            <div class="file-list" id="fl-foto"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Orçamento (se disponível)</label>
+          <div class="upload-box">
+            <input type="file" accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls,.doc,.docx" onchange="handleFile(this,'orc')" multiple>
+            <div class="upload-ico">📄</div>
+            <div class="upload-txt"><strong>Clique ou arraste</strong><br>PDF, imagem ou planilha</div>
+            <div class="file-list" id="fl-orc"></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-submit" onclick="submitForm()">📨 Enviar Solicitação ao PCM</button>
+    </div>
+  </div>
+</div>
+
+<!-- PCM -->
+<div id="v-pcm" class="view">
+  <div id="pcm-login" class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">
+        <svg viewBox="0 0 160 48" fill="none" style="height:44px;width:auto;margin-bottom:4px">
+          <polyline points="2,4 17,24 2,44" stroke="#cc2222" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="14,4 29,24 14,44" stroke="#cc2222" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="38" y="34" font-family="'Barlow Condensed',Arial Black,sans-serif" font-size="30" font-weight="900" fill="#0d1f3c" letter-spacing="1">MAKRO</text>
+        </svg>
+        <p>Painel PCM — Manutenção</p>
+      </div>
+      <h2>Acesso Restrito</h2>
+      <div class="lf"><label>Usuário</label><input type="text" id="l-user" placeholder="seu.usuario" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="lf"><label>Senha</label><input type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn-login" onclick="doLogin()">Entrar no Painel</button>
+      <p class="login-hint">Acesso exclusivo para equipe PCM<br><small>Demo: <b>pcm</b> / <b>makro2024</b></small></p>
+    </div>
+  </div>
+  <div id="pcm-dash" style="display:none">
+    <div class="dash">
+      <div class="dash-hdr">
+        <div>
+          <h2>Painel <span>PCM</span></h2>
+          <div style="font-size:.8rem;color:var(--gray);margin-top:2px" id="dash-user"></div>
+        </div>
+        <div class="dash-actions">
+          <button class="btn btn-navy" onclick="loadDash()">🔄 Atualizar</button>
+          <button class="btn btn-navy" onclick="exportCSV()">⬇ Exportar Excel</button>
+          <button class="btn btn-out" onclick="doLogout()">Sair</button>
+        </div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi k-navy"><div class="kpi-lbl">Total</div><div class="kpi-val" id="k-total">0</div><div class="kpi-sub">solicitações</div></div>
+        <div class="kpi k-red"><div class="kpi-lbl">Críticas</div><div class="kpi-val" id="k-crit">0</div><div class="kpi-sub">prioridade crítica</div></div>
+        <div class="kpi k-orange"><div class="kpi-lbl">Em Aberto</div><div class="kpi-val" id="k-open">0</div><div class="kpi-sub">recebido + análise</div></div>
+        <div class="kpi k-green"><div class="kpi-lbl">Concluídas</div><div class="kpi-val" id="k-done">0</div><div class="kpi-sub">este mês</div></div>
+      </div>
+      <div class="chart-grid">
+        <div class="chart-card"><div class="chart-title">📊 Por <span>Status</span></div><div class="chart-box"><canvas id="c-status"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">🎯 Por <span>Prioridade</span></div><div class="chart-box"><canvas id="c-prio"></canvas></div></div>
+      </div>
+      <div class="filters">
+        <div class="fg"><label>Prioridade</label><select id="fi-prio" onchange="renderTable()"><option value="">Todas</option><option>Baixa</option><option>Média</option><option>Alta</option><option>Crítica</option></select></div>
+        <div class="fg"><label>Tipo</label><select id="fi-tipo" onchange="renderTable()"><option value="">Todos</option><option>Peças</option><option>Serviço</option></select></div>
+        <div class="fg"><label>Status</label><select id="fi-status" onchange="renderTable()"><option value="">Todos</option><option>Recebido</option><option>Em Análise</option><option>Aprovado</option><option>Concluído</option></select></div>
+        <div class="fg"><label>Data</label><input type="date" id="fi-data" onchange="renderTable()"></div>
+        <button class="btn btn-gray" onclick="clearFilters()">✕ Limpar</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>Data / Hora</th><th>Solicitante</th><th>TAG</th>
+            <th>Tipo</th><th>Prioridade</th><th>Status</th>
+            <th style="color:#7eb3ff">SA</th><th style="color:#81c784">SC</th><th style="color:#ce93d8">IP</th>
+            <th>Descrição</th>
+          </tr></thead>
+          <tbody id="tbl-body"></tbody>
+        </table>
+        <div class="no-data" id="no-data" style="display:none">Nenhuma solicitação encontrada.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-ov" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hdr">
+      <h3 id="modal-title">Detalhes</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-grid" id="modal-grid"></div>
+      <div class="desc-box"><label>Descrição</label><p id="modal-desc"></p></div>
+      <div class="modal-sec">
+        <label>Status</label>
+        <div class="status-row">
+          <select id="modal-status"><option>Recebido</option><option>Em Análise</option><option>Aprovado</option><option>Concluído</option></select>
+          <button class="btn btn-red" onclick="saveStatus()">Salvar Status</button>
+        </div>
+      </div>
+      <div class="modal-sec">
+        <label>📎 Anexos</label>
+        <div class="anexo-list" id="modal-anexos"><span style="font-size:.8rem;color:var(--gray)">Nenhum anexo enviado.</span></div>
+      </div>
+      <div class="modal-sec">
+        <label>Observações Internas do PCM</label>
+        <div class="comment-list" id="modal-comments"></div>
+        <div class="comment-row">
+          <input type="text" id="comment-inp" placeholder="Adicionar observação (fornecedor, prazo, decisão...)">
+          <button class="btn btn-red" onclick="addComment()">+ Registrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="loading"><div class="ld-card"><span class="spin">⚙️</span><p id="ld-msg">Carregando...</p></div></div>
+
+<script>
+const SB_URL = 'https://ymcpfhdxsxllybdkcctt.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltY3BmaGR4c3hsbHliZGtjY3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MTI4OTksImV4cCI6MjA5MjA4ODg5OX0.vG-j5BBh2hqX1AEnqs_86osGU5sJ3BwVSLoynatkOvA';
+const BUCKET = 'anexos';
+const TABLE  = 'solicitacoes';
+const hdrs   = {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
+
+async function sbGet(){
+  const r=await fetch(`${SB_URL}/rest/v1/${TABLE}?select=*&order=created_at.desc`,{headers:hdrs});
+  return r.json();
+}
+async function sbInsert(d){
+  const r=await fetch(`${SB_URL}/rest/v1/${TABLE}`,{method:'POST',headers:{...hdrs,'Prefer':'return=representation'},body:JSON.stringify(d)});
+  return r.json();
+}
+async function sbUpdate(id,d){
+  const r=await fetch(`${SB_URL}/rest/v1/${TABLE}?id=eq.${id}`,{method:'PATCH',headers:{...hdrs,'Prefer':'return=representation'},body:JSON.stringify(d)});
+  return r.json();
+}
+async function sbUpload(path,file){
+  await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${path}`,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':file.type,'x-upsert':'true'},body:file});
+  return `${SB_URL}/storage/v1/object/public/${BUCKET}/${path}`;
+}
+
+let rows=[],selTipoVal='',selPrioVal='',modalId=null,curUser='';
+const pf={foto:[],orc:[]};
+const USERS={'pcm':'makro2024','pcm.planejamento':'makro2024','admin':'makro2024'};
+let cS=null,cP=null;
+
+function showView(v){
+  document.querySelectorAll('.view').forEach(e=>e.classList.remove('active'));
+  document.getElementById(v).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(e=>e.classList.remove('active'));
+  document.getElementById(v==='v-form'?'tab-form':'tab-pcm').classList.add('active');
+}
+function ld(show,msg='Carregando...'){
+  document.getElementById('loading').className=show?'show':'';
+  document.getElementById('ld-msg').textContent=msg;
+}
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+function pk(p){return(p||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+function sk(s){return(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s/g,'');}
+
+function selTipo(t){
+  selTipoVal=t;
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('t-'+t.replace('ç','c').replace('ã','a')).classList.add('selected');
+}
+function selPrio(p){
+  selPrioVal=p;
+  document.querySelectorAll('.prio-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('p-'+p).classList.add('selected');
+}
+function handleFile(input,type){
+  pf[type]=Array.from(input.files);
+  const list=document.getElementById('fl-'+type);
+  list.innerHTML='';
+  pf[type].forEach(f=>{const d=document.createElement('div');d.className='file-tag';d.textContent='📎 '+(f.name.length>20?f.name.slice(0,20)+'…':f.name);list.appendChild(d);});
+}
+
+async function submitForm(){
+  const nome=document.getElementById('f-nome').value.trim();
+  const mat=document.getElementById('f-mat').value.trim();
+  const tag=document.getElementById('f-tag').value.trim();
+  const hor=document.getElementById('f-hor').value.trim();
+  const desc=document.getElementById('f-desc').value.trim();
+  if(!nome||!mat||!tag||!hor||!selTipoVal||!selPrioVal||!desc){toast('⚠️ Preencha todos os campos obrigatórios!');return;}
+  ld(true,'Enviando solicitação...');
+  try{
+    const now=new Date();
+    const dh=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    const rec={nome,matricula:mat,tag,horimetro:hor,tipo:selTipoVal,prioridade:selPrioVal,descricao:desc,status:'Recebido',data_hora:dh,comentarios:[],sa:'',sc:'',ip:'',anexos:[]};
+    const res=await sbInsert(rec);
+    const id=res[0]?.id;
+    if(!id) throw new Error('Erro ao salvar');
+    const allFiles=[...pf.foto.map(f=>({f,type:'foto'})),...pf.orc.map(f=>({f,type:'orcamento'}))];
+    if(allFiles.length>0){
+      const anexos=[];
+      for(const {f,type} of allFiles){
+        ld(true,`Enviando ${f.name}...`);
+        const path=`${id}/${type}_${Date.now()}_${f.name}`;
+        const url=await sbUpload(path,f);
+        anexos.push({name:f.name,url,fileType:type});
+      }
+      await sbUpdate(id,{anexos});
+    }
+    ['f-nome','f-mat','f-tag','f-hor','f-desc'].forEach(i=>document.getElementById(i).value='');
+    ['fl-foto','fl-orc'].forEach(i=>document.getElementById(i).innerHTML='');
+    document.querySelectorAll('.type-btn,.prio-btn').forEach(b=>b.classList.remove('selected'));
+    pf.foto=[];pf.orc=[];selTipoVal='';selPrioVal='';
+    ld(false);
+    toast('✅ Solicitação enviada com sucesso ao PCM!');
+  }catch(e){ld(false);console.error(e);toast('❌ Erro ao enviar. Verifique sua conexão.');}
+}
+
+function doLogin(){
+  const u=document.getElementById('l-user').value.trim();
+  const p=document.getElementById('l-pass').value;
+  if(USERS[u]&&USERS[u]===p){
+    curUser=u;
+    document.getElementById('pcm-login').style.display='none';
+    document.getElementById('pcm-dash').style.display='block';
+    document.getElementById('dash-user').textContent='Usuário: '+u;
+    loadDash();
+  }else toast('❌ Usuário ou senha incorretos');
+}
+function doLogout(){
+  curUser='';rows=[];
+  document.getElementById('pcm-login').style.display='flex';
+  document.getElementById('pcm-dash').style.display='none';
+  document.getElementById('l-user').value='';
+  document.getElementById('l-pass').value='';
+}
+
+async function loadDash(){
+  ld(true,'Carregando dados...');
+  try{rows=await sbGet();if(!Array.isArray(rows))rows=[];}catch(e){rows=[];}
+  ld(false);updateKPIs();renderCharts();renderTable();
+}
+function updateKPIs(){
+  document.getElementById('k-total').textContent=rows.length;
+  document.getElementById('k-crit').textContent=rows.filter(s=>s.prioridade==='Crítica').length;
+  document.getElementById('k-open').textContent=rows.filter(s=>s.status==='Recebido'||s.status==='Em Análise').length;
+  document.getElementById('k-done').textContent=rows.filter(s=>s.status==='Concluído').length;
+}
+function renderCharts(){
+  if(cS)cS.destroy();
+  const st=['Recebido','Em Análise','Aprovado','Concluído'];
+  cS=new Chart(document.getElementById('c-status'),{type:'doughnut',data:{labels:st,datasets:[{data:st.map(s=>rows.filter(x=>x.status===s).length),backgroundColor:['#1565c0','#f57f17','#2e7d32','#6a1b9a'],borderWidth:3,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{family:'Barlow',size:11},boxWidth:14,padding:10}}},cutout:'62%'}});
+  if(cP)cP.destroy();
+  const pr=['Baixa','Média','Alta','Crítica'];
+  cP=new Chart(document.getElementById('c-prio'),{type:'bar',data:{labels:pr,datasets:[{label:'Solicitações',data:pr.map(p=>rows.filter(x=>x.prioridade===p).length),backgroundColor:['#43a047','#fb8c00','#ef6c00','#cc2222'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:'Barlow',size:11}},grid:{color:'#e2e8f0'}},x:{ticks:{font:{family:'Barlow',size:11}},grid:{display:false}}}}});
+}
+function renderTable(){
+  const fp=document.getElementById('fi-prio').value;
+  const ft=document.getElementById('fi-tipo').value;
+  const fs=document.getElementById('fi-status').value;
+  const fd=document.getElementById('fi-data').value;
+  let f=rows.filter(s=>{
+    if(fp&&s.prioridade!==fp)return false;
+    if(ft&&s.tipo!==ft)return false;
+    if(fs&&s.status!==fs)return false;
+    if(fd){const d=fd.split('-').reverse().join('/');if(!(s.data_hora||'').startsWith(d))return false;}
+    return true;
+  });
+  const tb=document.getElementById('tbl-body');
+  tb.innerHTML='';
+  document.getElementById('no-data').style.display=f.length===0?'block':'none';
+  f.forEach(s=>{
+    const tr=document.createElement('tr');
+    tr.onclick=()=>openModal(s.id);
+    tr.innerHTML=`
+      <td style="white-space:nowrap;font-size:.8rem">${s.data_hora||''}</td>
+      <td><div style="font-weight:600">${s.nome||''}</div><div style="font-size:.75rem;color:var(--gray)">${s.matricula||''}</div></td>
+      <td><code style="background:var(--off);padding:2px 6px;border-radius:4px;font-size:.82rem">${s.tag||''}</code></td>
+      <td><span class="badge b-${s.tipo==='Peças'?'pecas':'servico'}">${s.tipo||''}</span></td>
+      <td><span class="badge b-${pk(s.prioridade)}">${s.prioridade||''}</span></td>
+      <td><span class="badge b-${sk(s.status)}">${s.status||''}</span></td>
+      <td style="font-weight:700;color:#1a5296;font-size:.85rem">${s.sa||'—'}</td>
+      <td style="font-weight:700;color:#2e7d32;font-size:.85rem">${s.sc||'—'}</td>
+      <td style="font-weight:700;color:#6a1b9a;font-size:.85rem">${s.ip||'—'}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem">${s.descricao||''}</td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+function clearFilters(){['fi-prio','fi-tipo','fi-status','fi-data'].forEach(i=>document.getElementById(i).value='');renderTable();}
+
+function openModal(id){
+  const s=rows.find(x=>x.id===id);if(!s)return;
+  modalId=id;
+  document.getElementById('modal-title').textContent=`Solicitação — ${s.tag}`;
+  document.getElementById('modal-grid').innerHTML=`
+    <div class="di"><label>Solicitante</label><div class="val">${s.nome||''}</div></div>
+    <div class="di"><label>Matrícula</label><div class="val">${s.matricula||''}</div></div>
+    <div class="di"><label>TAG</label><div class="val">${s.tag||''}</div></div>
+    <div class="di"><label>Horímetro/Hod.</label><div class="val">${s.horimetro||''}</div></div>
+    <div class="di"><label>Tipo</label><div class="val"><span class="badge b-${s.tipo==='Peças'?'pecas':'servico'}">${s.tipo||''}</span></div></div>
+    <div class="di"><label>Prioridade</label><div class="val"><span class="badge b-${pk(s.prioridade)}">${s.prioridade||''}</span></div></div>
+    <div class="di"><label>Data/Hora</label><div class="val">${s.data_hora||''}</div></div>
+    <div class="di"><label>Status</label><div class="val"><span class="badge b-${sk(s.status)}">${s.status||''}</span></div></div>
+    <div class="di"><label>SA — Solic. Aquisição</label><div class="val" style="font-weight:700;color:#1a5296">${s.sa||'<span style="color:#aaa;font-weight:400">Não informado</span>'}</div></div>
+    <div class="di"><label>SC — Solic. Compra</label><div class="val" style="font-weight:700;color:#2e7d32">${s.sc||'<span style="color:#aaa;font-weight:400">Não informado</span>'}</div></div>
+    <div class="di"><label>IP — Pedido Compra</label><div class="val" style="font-weight:700;color:#6a1b9a">${s.ip||'<span style="color:#aaa;font-weight:400">Não informado</span>'}</div></div>
+  `;
+  document.getElementById('modal-desc').textContent=s.descricao||'';
+  document.getElementById('modal-status').value=s.status||'Recebido';
+  renderAnexos(s);renderComments(s);
+  document.getElementById('modal-ov').classList.add('open');
+}
+function closeModal(e){if(!e||e.target===document.getElementById('modal-ov'))document.getElementById('modal-ov').classList.remove('open');}
+
+async function saveStatus(){
+  const s=rows.find(x=>x.id===modalId);
+  const ns=document.getElementById('modal-status').value;
+  ld(true,'Salvando status...');
+  await sbUpdate(modalId,{status:ns});
+  s.status=ns;ld(false);
+  renderTable();updateKPIs();renderCharts();
+  toast('✅ Status atualizado: '+ns);closeModal();
+}
+function renderAnexos(s){
+  const list=document.getElementById('modal-anexos');
+  const anexos=Array.isArray(s.anexos)?s.anexos:[];
+  if(anexos.length===0){list.innerHTML='<span style="font-size:.8rem;color:var(--gray)">Nenhum anexo enviado.</span>';return;}
+  list.innerHTML='';
+  anexos.forEach(a=>{
+    const el=document.createElement('a');
+    el.href=a.url;el.target='_blank';el.className='anexo-btn';
+    el.textContent=`${a.fileType==='foto'?'🖼️':'📄'} ${a.fileType==='foto'?'Foto':'Orçamento'}: ${(a.name||'').length>22?(a.name||'').slice(0,22)+'…':a.name||'Arquivo'}`;
+    list.appendChild(el);
+  });
+}
+function renderComments(s){
+  const list=document.getElementById('modal-comments');
+  const c=Array.isArray(s.comentarios)?s.comentarios:[];
+  if(c.length===0){list.innerHTML='<div style="font-size:.8rem;color:var(--gray);padding:.3rem">Nenhuma observação registrada.</div>';return;}
+  list.innerHTML='';
+  c.forEach(x=>{const d=document.createElement('div');d.className='comment-item';d.innerHTML=`<div class="comment-meta">🕐 ${x.data} — ${x.usuario||'PCM'}</div>${x.texto}`;list.appendChild(d);});
+}
+async function addComment(){
+  const inp=document.getElementById('comment-inp');
+  const txt=inp.value.trim();if(!txt)return;
+  const s=rows.find(x=>x.id===modalId);
+  const now=new Date();
+  const dh=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const c=Array.isArray(s.comentarios)?[...s.comentarios]:[];
+  c.push({texto:txt,data:dh,usuario:curUser});
+  ld(true,'Salvando...');
+  await sbUpdate(modalId,{comentarios:c});
+  s.comentarios=c;inp.value='';ld(false);
+  renderComments(s);toast('💬 Observação registrada!');
+}
+function exportCSV(){
+  const h=['Data/Hora','Solicitante','Matrícula','TAG','Horímetro','Tipo','Prioridade','Status','Descrição','SA','SC','IP'];
+  const r=rows.map(s=>[s.data_hora,s.nome,s.matricula,s.tag,s.horimetro,s.tipo,s.prioridade,s.status,`"${(s.descricao||'').replace(/"/g,'""')}"`,s.sa||'',s.sc||'',s.ip||'']);
+  const csv=[h.join(';'),...r.map(x=>x.join(';'))].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='Makro_Solicitacoes_'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.csv';
+  a.click();toast('📊 Exportação realizada!');
+}
+</script>
+</body>
+</html>
