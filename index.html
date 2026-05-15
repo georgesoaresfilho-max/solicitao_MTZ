@@ -498,7 +498,12 @@ function doLogout(){
 
 async function loadDash(){
   ld(true,'Carregando dados...');
-  try{rows=await sbGet();if(!Array.isArray(rows))rows=[];}catch(e){rows=[];}
+  try{
+    rows=await sbGet();
+    if(!Array.isArray(rows))rows=[];
+    const mtzFiliais=['WIND','CEARÁ','PERNAMBUCO','RIO GRANDE DO NORTE','PECEM','MATRIZ'];
+    rows=rows.filter(s=>mtzFiliais.includes(s.filial||''));
+  }
   ld(false);updateKPIs();renderCharts();renderTable();
 }
 function updateKPIs(){
