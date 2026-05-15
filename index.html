@@ -503,7 +503,7 @@ async function loadDash(){
     if(!Array.isArray(rows))rows=[];
     const mtzFiliais=['WIND','CEARÁ','PERNAMBUCO','RIO GRANDE DO NORTE','PECEM','MATRIZ'];
     rows=rows.filter(s=>mtzFiliais.includes(s.filial||''));
-  }
+  }catch(e){rows=[];}
   ld(false);updateKPIs();renderCharts();renderTable();
 }
 function updateKPIs(){
