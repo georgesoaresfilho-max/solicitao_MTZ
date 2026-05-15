@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Makro Engenharia — Manutenção AMP</title>
+<title>Makro Engenharia — Manutenção</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -161,7 +161,7 @@ tbody td{padding:.85rem 1rem;font-size:.88rem;color:var(--navy);vertical-align:m
         <polyline points="13,4 27,22 13,40" stroke="#cc2222" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
         <text x="35" y="31" font-family="'Barlow Condensed',Arial Black,sans-serif" font-size="27" font-weight="900" fill="white" letter-spacing="1">MAKRO</text>
       </svg>
-      <div class="logo-sub">Engenharia — Manutenção AMP</div>
+      <div class="logo-sub">Engenharia — Manutenção</div>
     </div>
     <nav class="nav-tabs">
       <button class="nav-tab active" onclick="showView('v-form')" id="tab-form">📋 <span class="tl">Solicitação</span></button>
@@ -189,9 +189,16 @@ tbody td{padding:.85rem 1rem;font-size:.88rem;color:var(--navy);vertical-align:m
         <div class="field"><label>Matrícula <span class="req">*</span></label><input type="text" id="f-mat" placeholder="Ex: 00123"></div>
       </div>
       <div class="row c2">
-        <div class="field"><label>Filial</label>
-          <input type="text" value="AMP" disabled style="background:#e8eaf6;color:#283593;font-weight:700;border:1.5px solid #c5cae9;border-radius:8px;padding:.65rem .9rem;font-size:.92rem;width:100%">
-          <input type="hidden" id="f-filial" value="AMP">
+        <div class="field"><label>Filial <span class="req">*</span></label>
+          <select id="f-filial">
+            <option value="">Selecione a filial...</option>
+            <option>WIND</option>
+            <option>CEARÁ</option>
+            <option>PERNAMBUCO</option>
+            <option>RIO GRANDE DO NORTE</option>
+            <option>PECEM</option>
+            <option>MATRIZ</option>
+          </select>
         </div>
       </div>
       <div class="sec-div"><span class="lbl">Identificação do Equipamento</span><span class="ln"></span></div>
@@ -269,7 +276,7 @@ tbody td{padding:.85rem 1rem;font-size:.88rem;color:var(--navy);vertical-align:m
           <polyline points="14,4 29,24 14,44" stroke="#cc2222" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
           <text x="38" y="34" font-family="'Barlow Condensed',Arial Black,sans-serif" font-size="30" font-weight="900" fill="#0d1f3c" letter-spacing="1">MAKRO</text>
         </svg>
-        <p>Painel PCM — AMP</p>
+        <p>Painel PCM — Manutenção</p>
       </div>
       <h2>Acesso Restrito</h2>
       <div class="lf"><label>Usuário</label><input type="text" id="l-user" placeholder="seu.usuario" onkeydown="if(event.key==='Enter')doLogin()"></div>
@@ -302,6 +309,15 @@ tbody td{padding:.85rem 1rem;font-size:.88rem;color:var(--navy);vertical-align:m
         <div class="chart-card"><div class="chart-title">🎯 Por <span>Prioridade</span></div><div class="chart-box"><canvas id="c-prio"></canvas></div></div>
       </div>
       <div class="filters">
+        <div class="fg"><label>Filial</label><select id="fi-filial" multiple onchange="renderTable()" style="height:auto;min-width:160px;border:1.5px solid var(--gray-light);border-radius:6px;padding:.3rem .5rem;font-family:'Barlow',sans-serif;font-size:.85rem;color:var(--navy);outline:none;background:var(--off)">
+            <option value="WIND">WIND</option>
+            <option value="CEARÁ">CEARÁ</option>
+            <option value="PERNAMBUCO">PERNAMBUCO</option>
+            <option value="RIO GRANDE DO NORTE">RIO GRANDE DO NORTE</option>
+            <option value="PECÉM">PECÉM</option>
+            <option value="MATRIZ">MATRIZ</option>
+          </select></div>
+        <div class="fg"><label>Filial</label><select id="fi-filial" multiple onchange="renderTable()" style="height:32px;min-width:140px"><option value="WIND">WIND</option><option value="CEARÁ">CEARÁ</option><option value="PERNAMBUCO">PERNAMBUCO</option><option value="RIO GRANDE DO NORTE">RN</option><option value="PECEM">PECEM</option><option value="MATRIZ">MATRIZ</option></select></div>
         <div class="fg"><label>Prioridade</label><select id="fi-prio" onchange="renderTable()"><option value="">Todas</option><option>Baixa</option><option>Média</option><option>Alta</option><option>Crítica</option></select></div>
         <div class="fg"><label>Tipo</label><select id="fi-tipo" onchange="renderTable()"><option value="">Todos</option><option>Peças</option><option>Serviço</option><option>Oficina</option></select></div>
         <div class="fg"><label>Status</label><select id="fi-status" onchange="renderTable()"><option value="">Todos</option><option>Recebido</option><option>Em Análise</option><option>Em Aprovação</option><option>Aprovado</option><option>Concluído</option></select></div>
@@ -431,7 +447,7 @@ async function submitForm(){
   const tag=document.getElementById('f-tag').value.trim();
   const hor=document.getElementById('f-hor').value.trim();
   const desc=document.getElementById('f-desc').value.trim();
-  const filial='AMP';
+  const filial=document.getElementById('f-filial').value;
   if(!nome||!mat||!tag||!hor||!filial||!selTipoVal||!selPrioVal||!desc){toast('⚠️ Preencha todos os campos obrigatórios!');return;}
   ld(true,'Enviando solicitação...');
   try{
@@ -482,7 +498,7 @@ function doLogout(){
 
 async function loadDash(){
   ld(true,'Carregando dados...');
-  try{rows=await sbGet();if(!Array.isArray(rows))rows=[];rows=rows.filter(s=>s.filial==='AMP');}catch(e){rows=[];}
+  try{rows=await sbGet();if(!Array.isArray(rows))rows=[];}catch(e){rows=[];}
   ld(false);updateKPIs();renderCharts();renderTable();
 }
 function updateKPIs(){
@@ -504,7 +520,7 @@ function renderTable(){
   const ft=document.getElementById('fi-tipo').value;
   const fs=document.getElementById('fi-status').value;
   const fd=document.getElementById('fi-data').value;
-  const ffil=[];
+  const ffil=Array.from(document.getElementById('fi-filial').selectedOptions).map(o=>o.value);
   let f=rows.filter(s=>{
     if(fp&&s.prioridade!==fp)return false;
     if(ft&&s.tipo!==ft)return false;
@@ -541,6 +557,7 @@ function renderTable(){
 }
 function clearFilters(){
   ['fi-prio','fi-tipo','fi-status','fi-data'].forEach(i=>document.getElementById(i).value='');
+  Array.from(document.getElementById('fi-filial').options).forEach(o=>o.selected=false);
   renderTable();
 }
 
