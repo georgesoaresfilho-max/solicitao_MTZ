@@ -476,7 +476,7 @@ function doLogin(){
     isEditor=EDITORS.includes(u);
     document.getElementById('pcm-login').style.display='none';
     document.getElementById('pcm-dash').style.display='block';
-    document.getElementById('dash-user').textContent='Usuário: '+u+(isEditor?'':' (Consultor)');
+    document.getElementById('dash-user').textContent='Usuario: '+u;
     loadDash();
   }else toast('❌ Usuário ou senha incorretos');
 }
