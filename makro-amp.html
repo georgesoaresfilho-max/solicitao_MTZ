@@ -128,8 +128,8 @@ tbody td{padding:.85rem 1rem;font-size:.88rem;color:var(--navy);vertical-align:m
 .modal-close{background:none;border:none;color:var(--gray);font-size:1.3rem;cursor:pointer;line-height:1}
 .modal-close:hover{color:var(--white)}
 .modal-body{padding:1.5rem}
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem}
-.di label{font-size:.72rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:3px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem}.detail-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:.8rem}
+  .di label{font-size:.72rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:3px}
 .di .val{font-size:.92rem;color:var(--navy);font-weight:500}
 .desc-box{margin-bottom:1.2rem}
 .desc-box label{font-size:.72rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px}
@@ -567,17 +567,23 @@ function openModal(id){
     <div class="di"><label>Prioridade</label><div class="val"><span class="badge b-${pk(s.prioridade)}">${s.prioridade||''}</span></div></div>
     <div class="di"><label>Data/Hora</label><div class="val">${s.data_hora||''}</div></div>
     <div class="di"><label>Status</label><div class="val"><span class="badge b-${sk(s.status)}">${s.status||''}</span></div></div>
-    <div class="detail-grid">
-      <div class="di"><label>SA</label><div class="val"><input type="text" id="modal-sa" value="${s.sa||''}" placeholder="Nº SA" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.82rem;color:#1a5296;font-weight:700;outline:none;width:100%;background:#f4f6f9"></div></div>
-      <div class="di"><label>Data SA</label><div class="val"><input type="datetime-local" id="modal-data-sa" value="${s.data_sa||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.78rem;outline:none;width:100%;background:#f4f6f9"></div></div>
-      <div class="di"><label>ID Fluig SA</label><div class="val"><input type="text" id="modal-fluig-sa" value="${s.fluig_sa||''}" placeholder="ID Fluig SA" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.82rem;outline:none;width:100%;background:#f4f6f9"></div></div>
-      <div class="di"><label>SC</label><div class="val"><input type="text" id="modal-sc" value="${s.sc||''}" placeholder="Nº SC" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.82rem;color:#2e7d32;font-weight:700;outline:none;width:100%;background:#f4f6f9"></div></div>
-      <div class="di"><label>Data SC</label><div class="val"><input type="datetime-local" id="modal-data-sc" value="${s.data_sc||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.78rem;outline:none;width:100%;background:#f4f6f9"></div></div>
-      <div class="di"><label>ID Fluig SC</label><div class="val"><input type="text" id="modal-fluig-sc" value="${s.fluig_sc||''}" placeholder="ID Fluig SC" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.82rem;outline:none;width:100%;background:#f4f6f9"></div></div>
-      <div class="di"><label>IP</label><div class="val"><input type="text" id="modal-ip" value="${s.ip||''}" placeholder="Nº IP" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.82rem;color:#6a1b9a;font-weight:700;outline:none;width:100%;background:#f4f6f9"></div></div>
-      <div class="di"><label>Data IP</label><div class="val"><input type="datetime-local" id="modal-data-ip" value="${s.data_ip||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.78rem;outline:none;width:100%;background:#f4f6f9"></div></div>
-      <div class="di"><label>ID Fluig IP</label><div class="val"><input type="text" id="modal-fluig-ip" value="${s.fluig_ip||''}" placeholder="ID Fluig IP" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.82rem;outline:none;width:100%;background:#f4f6f9"></div></div>
-      <div class="di"><label>Data Conclusão</label><div class="val"><input type="datetime-local" id="modal-data-conclusao" value="${s.data_conclusao||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.78rem;outline:none;width:100%;background:#f4f6f9"></div></div>
+    <div class="detail-grid-3">
+      <div class="di"><label>SA</label><div class="val"><input type="text" id="modal-sa" value="${s.sa||''}" placeholder="Nº SA" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;color:#1a5296;font-weight:700;outline:none;width:100%;background:#f4f6f9"></div></div>
+      <div class="di"><label>ID Fluig SA</label><div class="val"><input type="text" id="modal-fluig-sa" value="${s.fluig_sa||''}" placeholder="ID Fluig SA" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;outline:none;width:100%;background:#f4f6f9"></div></div>
+      <div class="di"><label>Data SA</label><div class="val"><input type="date" id="modal-data-sa" value="${s.data_sa||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;outline:none;width:100%;background:#f4f6f9"></div></div>
+    </div>
+    <div class="detail-grid-3">
+      <div class="di"><label>SC</label><div class="val"><input type="text" id="modal-sc" value="${s.sc||''}" placeholder="Nº SC" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;color:#2e7d32;font-weight:700;outline:none;width:100%;background:#f4f6f9"></div></div>
+      <div class="di"><label>ID Fluig SC</label><div class="val"><input type="text" id="modal-fluig-sc" value="${s.fluig_sc||''}" placeholder="ID Fluig SC" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;outline:none;width:100%;background:#f4f6f9"></div></div>
+      <div class="di"><label>Data SC</label><div class="val"><input type="date" id="modal-data-sc" value="${s.data_sc||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;outline:none;width:100%;background:#f4f6f9"></div></div>
+    </div>
+    <div class="detail-grid-3">
+      <div class="di"><label>IP</label><div class="val"><input type="text" id="modal-ip" value="${s.ip||''}" placeholder="Nº IP" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;color:#6a1b9a;font-weight:700;outline:none;width:100%;background:#f4f6f9"></div></div>
+      <div class="di"><label>ID Fluig IP</label><div class="val"><input type="text" id="modal-fluig-ip" value="${s.fluig_ip||''}" placeholder="ID Fluig IP" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;outline:none;width:100%;background:#f4f6f9"></div></div>
+      <div class="di"><label>Data IP</label><div class="val"><input type="date" id="modal-data-ip" value="${s.data_ip||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;outline:none;width:100%;background:#f4f6f9"></div></div>
+    </div>
+    <div class="detail-grid-3">
+      <div class="di"><label>Data Conclusão</label><div class="val"><input type="date" id="modal-data-conclusao" value="${s.data_conclusao||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;outline:none;width:100%;background:#f4f6f9"></div></div>
     </div>
     `;
   document.getElementById('modal-desc').textContent=s.descricao||'';
