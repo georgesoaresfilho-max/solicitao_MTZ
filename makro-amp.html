@@ -555,6 +555,10 @@ if(s.created_at&&s.data_sa){const d1=new Date(s.created_at);const d2=new Date(s.
   document.getElementById('lt-sc').textContent=avg(ltSC);
   document.getElementById('lt-ip').textContent=avg(ltIP);
   document.getElementById('lt-conclusao').textContent=avg(ltConc);
+  const semSA=rows.filter(s=>!s.data_sa);
+document.getElementById('lt-sem-sa').textContent=semSA.length;
+const diasAberto=semSA.map(s=>{const d=new Date(s.created_at);return Math.round((new Date()-d)/(1000*60*60*24));}).filter(x=>x>=0);
+document.getElementById('lt-media-aberto').textContent=diasAberto.length?(diasAberto.reduce((a,b)=>a+b,0)/diasAberto.length).toFixed(1):'—';
 }
 function renderTable(){
   const fp=document.getElementById('fi-prio').value;
