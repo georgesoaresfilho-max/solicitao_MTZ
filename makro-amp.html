@@ -584,7 +584,6 @@ function openModal(id){
     </div>
     <div class="di"><label>Data Conclusão</label><div class="val"><input type="datetime-local" id="modal-data-conclusao" value="${s.data_conclusao||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.78rem;outline:none;width:100%;background:#f4f6f9"></div></div>
 `;
-  `;
   document.getElementById('modal-desc').textContent=s.descricao||'';
   document.getElementById('modal-status').value=s.status||'Recebido';
   renderAnexos(s);renderComments(s);
