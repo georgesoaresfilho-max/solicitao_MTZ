@@ -129,6 +129,7 @@ tbody td{padding:.85rem 1rem;font-size:.88rem;color:var(--navy);vertical-align:m
 .modal-close:hover{color:var(--white)}
 .modal-body{padding:1.5rem}
 .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem}
+.detail-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-bottom:.8rem}
 .di label{font-size:.72rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:3px}
 .di .val{font-size:.92rem;color:var(--navy);font-weight:500}
 .desc-box{margin-bottom:1.2rem}
@@ -304,6 +305,43 @@ tbody td{padding:.85rem 1rem;font-size:.88rem;color:var(--navy);vertical-align:m
         <div class="kpi k-orange"><div class="kpi-lbl">Em Aberto</div><div class="kpi-val" id="k-open">0</div><div class="kpi-sub">recebido + análise</div></div>
         <div class="kpi k-green"><div class="kpi-lbl">Concluídas</div><div class="kpi-val" id="k-done">0</div><div class="kpi-sub">este mês</div></div>
       </div>
+      <div style="background:var(--white);border-radius:12px;padding:1.2rem 1.4rem;box-shadow:var(--shadow);margin-bottom:1.5rem">
+        <div class="chart-title">⏱️ Lead Time Médio <span>(dias)</span></div>
+        <div id="leadtime-cards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:.5rem">
+          <div style="background:#e3f2fd;border-radius:10px;padding:1rem;text-align:center">
+            <div style="font-size:.72rem;font-weight:700;color:#1565c0;text-transform:uppercase;letter-spacing:.08em">Solicitação → SA</div>
+            <div id="lt-sa" style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:#1565c0">—</div>
+            <div style="font-size:.72rem;color:#1565c0">dias</div>
+          </div>
+          <div style="background:#e8f5e9;border-radius:10px;padding:1rem;text-align:center">
+            <div style="font-size:.72rem;font-weight:700;color:#2e7d32;text-transform:uppercase;letter-spacing:.08em">SA → SC</div>
+            <div id="lt-sc" style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:#2e7d32">—</div>
+            <div style="font-size:.72rem;color:#2e7d32">dias</div>
+          </div>
+          <div style="background:#f3e5f5;border-radius:10px;padding:1rem;text-align:center">
+            <div style="font-size:.72rem;font-weight:700;color:#6a1b9a;text-transform:uppercase;letter-spacing:.08em">SC → IP</div>
+            <div id="lt-ip" style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:#6a1b9a">—</div>
+            <div style="font-size:.72rem;color:#6a1b9a">dias</div>
+          </div>
+          <div style="background:#fff3e0;border-radius:10px;padding:1rem;text-align:center">
+            <div style="font-size:.72rem;font-weight:700;color:#e65100;text-transform:uppercase;letter-spacing:.08em">IP → Conclusão</div>
+            <div id="lt-conclusao" style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:#e65100">—</div>
+            <div style="font-size:.72rem;color:#e65100">dias</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:1rem;margin-top:1rem;padding-top:1rem;border-top:1px solid #e2e8f0">
+          <div style="flex:1;background:#ffebee;border-radius:10px;padding:.8rem 1rem">
+            <div style="font-size:.72rem;font-weight:700;color:#b71c1c;text-transform:uppercase;letter-spacing:.08em">📋 Sem SA</div>
+            <div id="lt-sem-sa" style="font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:900;color:#b71c1c">—</div>
+            <div style="font-size:.72rem;color:#b71c1c">solicitações</div>
+          </div>
+          <div style="flex:1;background:#fff8e1;border-radius:10px;padding:.8rem 1rem">
+            <div style="font-size:.72rem;font-weight:700;color:#f57f17;text-transform:uppercase;letter-spacing:.08em">⏳ Média em aberto</div>
+            <div id="lt-media-aberto" style="font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:900;color:#f57f17">—</div>
+            <div style="font-size:.72rem;color:#f57f17">dias sem SA</div>
+          </div>
+        </div>
+      </div>
       <div class="chart-grid">
         <div class="chart-card"><div class="chart-title">📊 Por <span>Status</span></div><div class="chart-box"><canvas id="c-status"></canvas></div></div>
         <div class="chart-card"><div class="chart-title">🎯 Por <span>Prioridade</span></div><div class="chart-box"><canvas id="c-prio"></canvas></div></div>
@@ -402,8 +440,10 @@ async function sbUpload(path,file){
 
 let rows=[],selTipoVal='',selPrioVal='',modalId=null,curUser='';
 const pf={foto:[],orc:[]};
-const USERS={'pcm':'makro2024','pcm.planejamento':'makro2024','admin':'makro2024'};
+const USERS={'pcm':'makro2024','pcm.planejamento':'makro2024','admin':'makro2024','consultor':'consulta123'};
+const EDITORS=['pcm','pcm.planejamento','admin'];
 let cS=null,cP=null;
+let isEditor=false;
 
 function showView(v){
   document.querySelectorAll('.view').forEach(e=>e.classList.remove('active'));
@@ -482,6 +522,7 @@ function doLogin(){
   const p=document.getElementById('l-pass').value;
   if(USERS[u]&&USERS[u]===p){
     curUser=u;
+    isEditor=EDITORS.includes(u);
     document.getElementById('pcm-login').style.display='none';
     document.getElementById('pcm-dash').style.display='block';
     document.getElementById('dash-user').textContent='Usuário: '+u;
@@ -519,6 +560,23 @@ function renderCharts(){
   if(cP)cP.destroy();
   const pr=['Baixa','Média','Alta','Crítica'];
   cP=new Chart(document.getElementById('c-prio'),{type:'bar',data:{labels:pr,datasets:[{label:'Solicitações',data:pr.map(p=>rows.filter(x=>x.prioridade===p).length),backgroundColor:['#43a047','#fb8c00','#ef6c00','#cc2222'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:'Barlow',size:11}},grid:{color:'#e2e8f0'}},x:{ticks:{font:{family:'Barlow',size:11}},grid:{display:false}}}}});
+function diffDias(d1,d2){if(!d1||!d2)return null;const diff=new Date(d2)-new Date(d1);return Math.round(diff/(1000*60*60*24));}
+  const ltSA=[],ltSC=[],ltIP=[],ltConc=[];
+  rows.forEach(s=>{
+    if(s.created_at&&s.data_sa){const d1=new Date(s.created_at);const d2=new Date(s.data_sa);if(!isNaN(d1)&&!isNaN(d2))ltSA.push(diffDias(d1,d2));}
+    if(s.data_sa&&s.data_sc){const d1=new Date(s.data_sa);const d2=new Date(s.data_sc);if(!isNaN(d1)&&!isNaN(d2))ltSC.push(diffDias(d1,d2));}
+    if(s.data_sc&&s.data_ip){const d1=new Date(s.data_sc);const d2=new Date(s.data_ip);if(!isNaN(d1)&&!isNaN(d2))ltIP.push(diffDias(d1,d2));}
+    if(s.data_ip&&s.data_conclusao){const d1=new Date(s.data_ip);const d2=new Date(s.data_conclusao);if(!isNaN(d1)&&!isNaN(d2))ltConc.push(diffDias(d1,d2));}
+  });
+  const avg=arr=>arr.filter(x=>x!==null&&x>=0).length?(arr.filter(x=>x!==null&&x>=0).reduce((a,b)=>a+b,0)/arr.filter(x=>x!==null&&x>=0).length).toFixed(1):'—';
+  document.getElementById('lt-sa').textContent=avg(ltSA);
+  document.getElementById('lt-sc').textContent=avg(ltSC);
+  document.getElementById('lt-ip').textContent=avg(ltIP);
+  document.getElementById('lt-conclusao').textContent=avg(ltConc);
+  const semSA=rows.filter(s=>!s.data_sa);
+  document.getElementById('lt-sem-sa').textContent=semSA.length;
+  const diasAberto=semSA.map(s=>{const d=new Date(s.created_at);return Math.round((new Date()-d)/(1000*60*60*24));}).filter(x=>x>=0);
+  document.getElementById('lt-media-aberto').textContent=diasAberto.length?(diasAberto.reduce((a,b)=>a+b,0)/diasAberto.length).toFixed(1):'—';
 }
 function renderTable(){
   const fp=document.getElementById('fi-prio').value;
@@ -581,13 +639,24 @@ function openModal(id){
     <div class="di"><label>Prioridade</label><div class="val"><span class="badge b-${pk(s.prioridade)}">${s.prioridade||''}</span></div></div>
     <div class="di"><label>Data/Hora</label><div class="val">${s.data_hora||''}</div></div>
     <div class="di"><label>Status</label><div class="val"><span class="badge b-${sk(s.status)}">${s.status||''}</span></div></div>
-    <div class="di"><label>SA — Solic. Aquisição</label><div class="val"><input type="text" id="modal-sa" value="${s.sa||''}" placeholder="Nº SA" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.4rem .7rem;font-size:.88rem;color:#1a5296;font-weight:700;outline:none;width:100%;background:#f4f6f9"></div></div>
-    <div class="di"><label>ID FLUIG — SA</label><div class="val"><input type="text" id="modal-fluig-sa" value="${s.fluig_sa||''}" placeholder="ID Fluig SA" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.4rem .7rem;font-size:.88rem;color:var(--gray-dark);outline:none;width:100%;background:#f4f6f9"></div></div>
-    <div class="di"><label>SC — Solic. Compra</label><div class="val"><input type="text" id="modal-sc" value="${s.sc||''}" placeholder="Nº SC" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.4rem .7rem;font-size:.88rem;color:#2e7d32;font-weight:700;outline:none;width:100%;background:#f4f6f9"></div></div>
-    <div class="di"><label>ID FLUIG — SC</label><div class="val"><input type="text" id="modal-fluig-sc" value="${s.fluig_sc||''}" placeholder="ID Fluig SC" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.4rem .7rem;font-size:.88rem;color:var(--gray-dark);outline:none;width:100%;background:#f4f6f9"></div></div>
-    <div class="di"><label>IP — Pedido Compra</label><div class="val"><input type="text" id="modal-ip" value="${s.ip||''}" placeholder="Nº IP" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.4rem .7rem;font-size:.88rem;color:#6a1b9a;font-weight:700;outline:none;width:100%;background:#f4f6f9"></div></div>
-    <div class="di"><label>ID FLUIG — IP</label><div class="val"><input type="text" id="modal-fluig-ip" value="${s.fluig_ip||''}" placeholder="ID Fluig IP" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.4rem .7rem;font-size:.88rem;color:var(--gray-dark);outline:none;width:100%;background:#f4f6f9"></div></div>
-  `;
+    <div class="detail-grid-3">
+      <div class="di"><label>SA</label><div class="val"><input type="text" id="modal-sa" value="${s.sa||''}" placeholder="Nº SA" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;color:#1a5296;font-weight:700;outline:none;width:100%;background:#f4f6f9"></div></div>
+      <div class="di"><label>ID Fluig SA</label><div class="val"><input type="text" id="modal-fluig-sa" value="${s.fluig_sa||''}" placeholder="ID Fluig SA" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;outline:none;width:100%;background:#f4f6f9"></div></div>
+      <div class="di"><label>Data SA</label><div class="val"><input type="date" id="modal-data-sa" value="${s.data_sa||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;outline:none;width:100%;background:#f4f6f9"></div></div>
+    </div>
+    <div class="detail-grid-3">
+      <div class="di"><label>SC</label><div class="val"><input type="text" id="modal-sc" value="${s.sc||''}" placeholder="Nº SC" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;color:#2e7d32;font-weight:700;outline:none;width:100%;background:#f4f6f9"></div></div>
+      <div class="di"><label>ID Fluig SC</label><div class="val"><input type="text" id="modal-fluig-sc" value="${s.fluig_sc||''}" placeholder="ID Fluig SC" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;outline:none;width:100%;background:#f4f6f9"></div></div>
+      <div class="di"><label>Data SC</label><div class="val"><input type="date" id="modal-data-sc" value="${s.data_sc||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;outline:none;width:100%;background:#f4f6f9"></div></div>
+    </div>
+    <div class="detail-grid-3">
+      <div class="di"><label>IP</label><div class="val"><input type="text" id="modal-ip" value="${s.ip||''}" placeholder="Nº IP" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;color:#6a1b9a;font-weight:700;outline:none;width:100%;background:#f4f6f9"></div></div>
+      <div class="di"><label>ID Fluig IP</label><div class="val"><input type="text" id="modal-fluig-ip" value="${s.fluig_ip||''}" placeholder="ID Fluig IP" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;outline:none;width:100%;background:#f4f6f9"></div></div>
+      <div class="di"><label>Data IP</label><div class="val"><input type="date" id="modal-data-ip" value="${s.data_ip||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;outline:none;width:100%;background:#f4f6f9"></div></div>
+    </div>
+    <div class="detail-grid-3">
+      <div class="di"><label>Data Conclusão</label><div class="val"><input type="date" id="modal-data-conclusao" value="${s.data_conclusao||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;outline:none;width:100%;background:#f4f6f9"></div></div>
+    </div>  `;
   document.getElementById('modal-desc').textContent=s.descricao||'';
   document.getElementById('modal-status').value=s.status||'Recebido';
   renderAnexos(s);renderComments(s);
@@ -596,6 +665,7 @@ function openModal(id){
 function closeModal(e){if(!e||e.target===document.getElementById('modal-ov'))document.getElementById('modal-ov').classList.remove('open');}
 
 async function saveStatus(){
+  if(!isEditor){toast('⚠️ Sem permissão para editar!');return;}
   const s=rows.find(x=>x.id===modalId);
   const ns=document.getElementById('modal-status').value;
   const sa=document.getElementById('modal-sa').value.trim();
@@ -605,8 +675,12 @@ async function saveStatus(){
   const fluig_sc=document.getElementById('modal-fluig-sc').value.trim();
   const fluig_ip=document.getElementById('modal-fluig-ip').value.trim();
   ld(true,'Salvando...');
-  await sbUpdate(modalId,{status:ns,sa,sc,ip,fluig_sa,fluig_sc,fluig_ip});
-  s.status=ns;s.sa=sa;s.sc=sc;s.ip=ip;s.fluig_sa=fluig_sa;s.fluig_sc=fluig_sc;s.fluig_ip=fluig_ip;
+  const data_sa=document.getElementById('modal-data-sa').value;
+  const data_sc=document.getElementById('modal-data-sc').value;
+  const data_ip=document.getElementById('modal-data-ip').value;
+  const data_conclusao=document.getElementById('modal-data-conclusao').value;
+  await sbUpdate(modalId,{status:ns,sa,sc,ip,fluig_sa,fluig_sc,fluig_ip,data_sa,data_sc,data_ip,data_conclusao});
+  s.status=ns;s.sa=sa;s.sc=sc;s.ip=ip;s.fluig_sa=fluig_sa;s.fluig_sc=fluig_sc;s.fluig_ip=fluig_ip;s.data_sa=data_sa;s.data_sc=data_sc;s.data_ip=data_ip;s.data_conclusao=data_conclusao;
   ld(false);
   renderTable();updateKPIs();renderCharts();
   toast('✅ Salvo com sucesso!');closeModal();
