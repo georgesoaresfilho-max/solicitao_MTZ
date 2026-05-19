@@ -534,11 +534,10 @@ function renderCharts(){
 function diffDias(d1,d2){if(!d1||!d2)return null;const diff=new Date(d2)-new Date(d1);return Math.round(diff/(1000*60*60*24));}
   const ltSA=[],ltSC=[],ltIP=[],ltConc=[];
   rows.forEach(s=>{
-    if(s.created_at&&s.data_sa)ltSA.push(diffDias(s.created_at,s.data_sa));
-    if(s.data_sa&&s.data_sc)ltSC.push(diffDias(s.data_sa,s.data_sc));
-    if(s.data_sc&&s.data_ip)ltIP.push(diffDias(s.data_sc,s.data_ip));
-    if(s.data_ip&&s.data_conclusao)ltConc.push(diffDias(s.data_ip,s.data_conclusao));
-  });
+if(s.created_at&&s.data_sa){const d1=new Date(s.created_at);const d2=new Date(s.data_sa);if(!isNaN(d1)&&!isNaN(d2))ltSA.push(diffDias(d1,d2));}
+    if(s.data_sa&&s.data_sc){const d1=new Date(s.data_sa);const d2=new Date(s.data_sc);if(!isNaN(d1)&&!isNaN(d2))ltSC.push(diffDias(d1,d2));}
+    if(s.data_sc&&s.data_ip){const d1=new Date(s.data_sc);const d2=new Date(s.data_ip);if(!isNaN(d1)&&!isNaN(d2))ltIP.push(diffDias(d1,d2));}
+    if(s.data_ip&&s.data_conclusao){const d1=new Date(s.data_ip);const d2=new Date(s.data_conclusao);if(!isNaN(d1)&&!isNaN(d2))ltConc.push(diffDias(d1,d2));}  });
   const avg=arr=>arr.length?(arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1):'—';
   document.getElementById('lt-sa').textContent=avg(ltSA);
   document.getElementById('lt-sc').textContent=avg(ltSC);
