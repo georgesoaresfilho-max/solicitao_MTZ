@@ -567,12 +567,16 @@ function openModal(id){
     <div class="di"><label>Prioridade</label><div class="val"><span class="badge b-${pk(s.prioridade)}">${s.prioridade||''}</span></div></div>
     <div class="di"><label>Data/Hora</label><div class="val">${s.data_hora||''}</div></div>
     <div class="di"><label>Status</label><div class="val"><span class="badge b-${sk(s.status)}">${s.status||''}</span></div></div>
-    <div class="di"><label>SA — Solic. Aquisição</label><div class="val"><input type="text" id="modal-sa" value="${s.sa||''}" placeholder="Nº SA" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.4rem .7rem;font-size:.88rem;color:#1a5296;font-weight:700;outline:none;width:100%;background:#f4f6f9"></div></div>
+    <div class="di"><label>SA — Solic. Aquisição</label><div class="val"><input type="text" id="modal-sa" value="${s.sa||''}" placeholder="Nº SA" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.4rem .7rem;font-size:.88rem;color:#1a5196;font-weight:700;outline:none;width:100%;background:#f4f6f9"></div></div>
+    <div class="di"><label>Data SA</label><div class="val"><input type="datetime-local" id="modal-data-sa" value="${s.data_sa||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.4rem .7rem;font-size:.88rem;color:#1a5296;outline:none;width:100%;background:#f4f6f9"></div></div>
     <div class="di"><label>ID FLUIG — SA</label><div class="val"><input type="text" id="modal-fluig-sa" value="${s.fluig_sa||''}" placeholder="ID Fluig SA" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.4rem .7rem;font-size:.88rem;color:var(--gray-dark);outline:none;width:100%;background:#f4f6f9"></div></div>
     <div class="di"><label>SC — Solic. Compra</label><div class="val"><input type="text" id="modal-sc" value="${s.sc||''}" placeholder="Nº SC" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.4rem .7rem;font-size:.88rem;color:#2e7d32;font-weight:700;outline:none;width:100%;background:#f4f6f9"></div></div>
+    <div class="di"><label>Data SC</label><div class="val"><input type="datetime-local" id="modal-data-sc" value="${s.data_sc||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.4rem .7rem;font-size:.88rem;color:#2e7d32;outline:none;width:100%;background:#f4f6f9"></div></div>
     <div class="di"><label>ID FLUIG — SC</label><div class="val"><input type="text" id="modal-fluig-sc" value="${s.fluig_sc||''}" placeholder="ID Fluig SC" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.4rem .7rem;font-size:.88rem;color:var(--gray-dark);outline:none;width:100%;background:#f4f6f9"></div></div>
     <div class="di"><label>IP — Pedido Compra</label><div class="val"><input type="text" id="modal-ip" value="${s.ip||''}" placeholder="Nº IP" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.4rem .7rem;font-size:.88rem;color:#6a1b9a;font-weight:700;outline:none;width:100%;background:#f4f6f9"></div></div>
+    <div class="di"><label>Data IP</label><div class="val"><input type="datetime-local" id="modal-data-ip" value="${s.data_ip||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.4rem .7rem;font-size:.88rem;color:#6a1b9a;outline:none;width:100%;background:#f4f6f9"></div></div>
     <div class="di"><label>ID FLUIG — IP</label><div class="val"><input type="text" id="modal-fluig-ip" value="${s.fluig_ip||''}" placeholder="ID Fluig IP" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.4rem .7rem;font-size:.88rem;color:var(--gray-dark);outline:none;width:100%;background:#f4f6f9"></div></div>
+    <div class="di"><label>Data Conclusão</label><div class="val"><input type="datetime-local" id="modal-data-conclusao" value="${s.data_conclusao||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.4rem .7rem;font-size:.88rem;color:#2e7d32;outline:none;width:100%;background:#f4f6f9"></div></div>
   `;
   document.getElementById('modal-desc').textContent=s.descricao||'';
   document.getElementById('modal-status').value=s.status||'Recebido';
@@ -592,8 +596,12 @@ async function saveStatus(){
   const fluig_sc=document.getElementById('modal-fluig-sc').value.trim();
   const fluig_ip=document.getElementById('modal-fluig-ip').value.trim();
   ld(true,'Salvando...');
-  await sbUpdate(modalId,{status:ns,sa,sc,ip,fluig_sa,fluig_sc,fluig_ip});
-  s.status=ns;s.sa=sa;s.sc=sc;s.ip=ip;s.fluig_sa=fluig_sa;s.fluig_sc=fluig_sc;s.fluig_ip=fluig_ip;
+  const data_sa=document.getElementById('modal-data-sa').value;
+const data_sc=document.getElementById('modal-data-sc').value;
+const data_ip=document.getElementById('modal-data-ip').value;
+const data_conclusao=document.getElementById('modal-data-conclusao').value;
+await sbUpdate(modalId,{status:ns,sa,sc,ip,fluig_sa,fluig_sc,fluig_ip,data_sa,data_sc,data_ip,data_conclusao});
+s.status=ns;s.sa=sa;s.sc=sc;s.ip=ip;s.fluig_sa=fluig_sa;s.fluig_sc=fluig_sc;s.fluig_ip=fluig_ip;s.data_sa=data_sa;s.data_sc=data_sc;s.data_ip=data_ip;s.data_conclusao=data_conclusao;
   ld(false);
   renderTable();updateKPIs();renderCharts();
   toast('✅ Salvo com sucesso!');closeModal();
