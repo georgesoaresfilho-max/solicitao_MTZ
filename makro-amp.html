@@ -297,6 +297,31 @@ tbody td{padding:.85rem 1rem;font-size:.88rem;color:var(--navy);vertical-align:m
         <div class="kpi k-orange"><div class="kpi-lbl">Em Aberto</div><div class="kpi-val" id="k-open">0</div><div class="kpi-sub">recebido + análise</div></div>
         <div class="kpi k-green"><div class="kpi-lbl">Concluídas</div><div class="kpi-val" id="k-done">0</div><div class="kpi-sub">este mês</div></div>
       </div>
+      <div style="background:var(--white);border-radius:12px;padding:1.2rem 1.4rem;box-shadow:var(--shadow);margin-bottom:1.5rem">
+  <div class="chart-title">⏱️ Lead Time Médio <span>(dias)</span></div>
+  <div id="leadtime-cards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:.5rem">
+    <div style="background:#e3f2fd;border-radius:10px;padding:1rem;text-align:center">
+      <div style="font-size:.72rem;font-weight:700;color:#1565c0;text-transform:uppercase;letter-spacing:.08em">Solicitação → SA</div>
+      <div id="lt-sa" style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:#1565c0">—</div>
+      <div style="font-size:.72rem;color:#1565c0">dias</div>
+    </div>
+    <div style="background:#e8f5e9;border-radius:10px;padding:1rem;text-align:center">
+      <div style="font-size:.72rem;font-weight:700;color:#2e7d32;text-transform:uppercase;letter-spacing:.08em">SA → SC</div>
+      <div id="lt-sc" style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:#2e7d32">—</div>
+      <div style="font-size:.72rem;color:#2e7d32">dias</div>
+    </div>
+    <div style="background:#f3e5f5;border-radius:10px;padding:1rem;text-align:center">
+      <div style="font-size:.72rem;font-weight:700;color:#6a1b9a;text-transform:uppercase;letter-spacing:.08em">SC → IP</div>
+      <div id="lt-ip" style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:#6a1b9a">—</div>
+      <div style="font-size:.72rem;color:#6a1b9a">dias</div>
+    </div>
+    <div style="background:#fff3e0;border-radius:10px;padding:1rem;text-align:center">
+      <div style="font-size:.72rem;font-weight:700;color:#e65100;text-transform:uppercase;letter-spacing:.08em">IP → Conclusão</div>
+      <div id="lt-conclusao" style="font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:#e65100">—</div>
+      <div style="font-size:.72rem;color:#e65100">dias</div>
+    </div>
+  </div>
+</div>
       <div class="chart-grid">
         <div class="chart-card"><div class="chart-title">📊 Por <span>Status</span></div><div class="chart-box"><canvas id="c-status"></canvas></div></div>
         <div class="chart-card"><div class="chart-title">🎯 Por <span>Prioridade</span></div><div class="chart-box"><canvas id="c-prio"></canvas></div></div>
@@ -506,7 +531,20 @@ function renderCharts(){
   if(cP)cP.destroy();
   const pr=['Baixa','Média','Alta','Crítica'];
   cP=new Chart(document.getElementById('c-prio'),{type:'bar',data:{labels:pr,datasets:[{label:'Solicitações',data:pr.map(p=>rows.filter(x=>x.prioridade===p).length),backgroundColor:['#43a047','#fb8c00','#ef6c00','#cc2222'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:'Barlow',size:11}},grid:{color:'#e2e8f0'}},x:{ticks:{font:{family:'Barlow',size:11}},grid:{display:false}}}}});
-}
+function diffDias(d1,d2){if(!d1||!d2)return null;const diff=new Date(d2)-new Date(d1);return Math.round(diff/(1000*60*60*24));}
+  const ltSA=[],ltSC=[],ltIP=[],ltConc=[];
+  rows.forEach(s=>{
+    if(s.created_at&&s.data_sa)ltSA.push(diffDias(s.created_at,s.data_sa));
+    if(s.data_sa&&s.data_sc)ltSC.push(diffDias(s.data_sa,s.data_sc));
+    if(s.data_sc&&s.data_ip)ltIP.push(diffDias(s.data_sc,s.data_ip));
+    if(s.data_ip&&s.data_conclusao)ltConc.push(diffDias(s.data_ip,s.data_conclusao));
+  });
+  const avg=arr=>arr.length?(arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1):'—';
+  document.getElementById('lt-sa').textContent=avg(ltSA);
+  document.getElementById('lt-sc').textContent=avg(ltSC);
+  document.getElementById('lt-ip').textContent=avg(ltIP);
+  document.getElementById('lt-conclusao').textContent=avg(ltConc);
+}}
 function renderTable(){
   const fp=document.getElementById('fi-prio').value;
   const ft=document.getElementById('fi-tipo').value;
