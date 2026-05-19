@@ -573,7 +573,7 @@ function diffDias(d1,d2){if(!d1||!d2)return null;const diff=new Date(d2)-new Dat
   document.getElementById('lt-sc').textContent=avg(ltSC);
   document.getElementById('lt-ip').textContent=avg(ltIP);
   document.getElementById('lt-conclusao').textContent=avg(ltConc);
-  const semSA=rows.filter(s=>!s.data_sa);
+  const semSA=rows.filter(s=>!s.data_sa&&!['Concluído','Aprovado','Cancelado','Duplicado'].includes(s.status));
   document.getElementById('lt-sem-sa').textContent=semSA.length;
   const diasAberto=semSA.map(s=>{const d=new Date(s.created_at);return Math.round((new Date()-d)/(1000*60*60*24));}).filter(x=>x>=0);
   document.getElementById('lt-media-aberto').textContent=diasAberto.length?(diasAberto.reduce((a,b)=>a+b,0)/diasAberto.length).toFixed(1):'—';
