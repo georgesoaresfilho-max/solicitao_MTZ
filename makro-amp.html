@@ -133,7 +133,7 @@ tbody td{padding:.85rem 1rem;font-size:.88rem;color:var(--navy);vertical-align:m
 .di .val{font-size:.92rem;color:var(--navy);font-weight:500}
 .desc-box{margin-bottom:1.2rem}
 .desc-box label{font-size:.72rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px}
-.desc-box p{font-size:.9rem;color:var(--navy);background:var(--off);padding:.8rem;border-radius:8px;line-height:1.5}
+.desc-box p{font-size:.9rem;color:var(--navy);background:var(--off);padding:.8rem;border-radius:8px;line-height:1.5;white-space:pre-line}
 .modal-sec{margin-bottom:1.2rem}
 .modal-sec>label{font-size:.78rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:8px}
 .status-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -623,7 +623,7 @@ function openModal(id){
       <div class="di"><label>Data Conclusão</label><div class="val"><input type="date" id="modal-data-conclusao" value="${s.data_conclusao||''}" style="border:1.5px solid #e2e8f0;border-radius:6px;padding:.3rem .5rem;font-size:.8rem;outline:none;width:100%;background:#f4f6f9"></div></div>
     </div>
     `;
-  document.getElementById('modal-desc').textContent=s.descricao||'';
+  const descFormatada=(s.descricao||'').replace(/Observação:/g,'\nObservação:').trim();document.getElementById('modal-desc').textContent=descFormatada;
   document.getElementById('modal-status').value=s.status||'Recebido';
   renderAnexos(s);renderComments(s);
   document.getElementById('modal-ov').classList.add('open');
