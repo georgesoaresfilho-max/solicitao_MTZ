@@ -329,6 +329,7 @@ tbody td{padding:.85rem 1rem;font-size:.88rem;color:var(--navy);vertical-align:m
         <div class="fg"><label>Status</label><select id="fi-status" onchange="renderTable()"><option value="">Todos</option><option>Recebido</option><option>Em Análise</option><option>Cancelado</option><option>Duplicado</option><option>Em Aprovação</option><option>Email Enviado</option><option>NF Lançada</option><option>Aprovado</option><option>Concluído</option></select></div>
         <div class="fg"><label>Data</label><input type="date" id="fi-data" onchange="renderTable()"></div>
         <button class="btn btn-gray" onclick="clearFilters()">✕ Limpar</button>
+        <div class="fg"><label>TAG / Frota</label><input type="text" id="fi-tag" oninput="renderTable()" placeholder="Ex: EXC-001" style="width:120px"></div>
       </div>
       <div class="tbl-wrap">
         <table>
@@ -550,12 +551,14 @@ function renderTable(){
   const ft=document.getElementById('fi-tipo').value;
   const fs=document.getElementById('fi-status').value;
   const fd=document.getElementById('fi-data').value;
+  const ftag=document.getElementById('fi-tag').value.trim().toLowerCase();
   const ffil=[];
   let f=rows.filter(s=>{
     if(fp&&s.prioridade!==fp)return false;
     if(ft&&s.tipo!==ft)return false;
     if(fs&&s.status!==fs)return false;
     if(fd){const d=fd.split('-').reverse().join('/');if(!(s.data_hora||'').startsWith(d))return false;}
+    if(ftag&&!(s.tag||'').toLowerCase().includes(ftag))return false;
     if(ffil.length>0&&!ffil.includes(s.filial||''))return false;
     return true;
   });
@@ -586,7 +589,7 @@ function renderTable(){
   });
 }
 function clearFilters(){
-  ['fi-prio','fi-tipo','fi-status','fi-data'].forEach(i=>document.getElementById(i).value='');
+  ['fi-prio','fi-tipo','fi-status','fi-data','fi-tag'].forEach(i=>document.getElementById(i).value='');
   renderTable();
 }
 
