@@ -330,6 +330,7 @@ tbody td{padding:.85rem 1rem;font-size:.88rem;color:var(--navy);vertical-align:m
         <div class="fg"><label>Data</label><input type="date" id="fi-data" onchange="renderTable()"></div>
         <button class="btn btn-gray" onclick="clearFilters()">✕ Limpar</button>
         <div class="fg"><label>TAG / Frota</label><input type="text" id="fi-tag" oninput="renderTable()" placeholder="Ex: EXC-001" style="width:120px"></div>
+        <div class="fg"><label>SA / SC / IP</label><input type="text" id="fi-sascip" oninput="renderTable()" placeholder="Ex: 12345" style="width:100px"></div>
       </div>
       <div class="tbl-wrap">
         <table>
@@ -559,6 +560,8 @@ function renderTable(){
     if(fs&&s.status!==fs)return false;
     if(fd){const d=fd.split('-').reverse().join('/');if(!(s.data_hora||'').startsWith(d))return false;}
     if(ftag&&!(s.tag||'').toLowerCase().includes(ftag))return false;
+    const fsascip=document.getElementById('fi-sascip').value.trim().toLowerCase();
+if(fsascip&&!((s.sa||'').toLowerCase().includes(fsascip)||(s.sc||'').toLowerCase().includes(fsascip)||(s.ip||'').toLowerCase().includes(fsascip)))return false;
     if(ffil.length>0&&!ffil.includes(s.filial||''))return false;
     return true;
   });
@@ -589,7 +592,7 @@ function renderTable(){
   });
 }
 function clearFilters(){
-  ['fi-prio','fi-tipo','fi-status','fi-data','fi-tag'].forEach(i=>document.getElementById(i).value='');
+  ['fi-prio','fi-tipo','fi-status','fi-data','fi-tag','fi-sascip'].forEach(i=>document.getElementById(i).value='');
   renderTable();
 }
 
