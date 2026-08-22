@@ -525,8 +525,8 @@ function updateKPIs(){
 }
 function renderCharts(){
   if(cS)cS.destroy();
-  const st=['Recebido','Em Análise','Em Aprovação','Aprovado','Aguardando Material','Concluído','Duplicado','Cancelado'];
-  cS=new Chart(document.getElementById('c-status'),{type:'doughnut',data:{labels:st,datasets:[{data:st.map(s=>rows.filter(x=>x.status===s).length),backgroundColor:['#1565c0','#f57f17','#7b1fa2','#2e7d32','#ff6f00','#6a1b9a','#9e9e9e','#b71c1c'],borderWidth:3,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{family:'Barlow',size:11},boxWidth:14,padding:10}}},cutout:'62%'}});
+  const st=['Recebido','Em Análise','Aprovado','Aguardando Material','Concluído'];
+  cS=new Chart(document.getElementById('c-status'),{type:'doughnut',data:{labels:st,datasets:[{data:st.map(s=>rows.filter(x=>x.status===s).length),backgroundColor:['#1565c0','#f57f17','#2e7d32','#ff6f00','#6a1b9a'],borderWidth:3,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{family:'Barlow',size:11},boxWidth:14,padding:10}}},cutout:'62%'}});
   if(cP)cP.destroy();
   const pr=['Baixa','Média','Alta','Crítica'];
   cP=new Chart(document.getElementById('c-prio'),{type:'bar',data:{labels:pr,datasets:[{label:'Solicitações',data:pr.map(p=>rows.filter(x=>x.prioridade===p).length),backgroundColor:['#43a047','#fb8c00','#ef6c00','#cc2222'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:'Barlow',size:11}},grid:{color:'#e2e8f0'}},x:{ticks:{font:{family:'Barlow',size:11}},grid:{display:false}}}}});
